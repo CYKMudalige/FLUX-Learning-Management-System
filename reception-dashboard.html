@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reception | Flux Academic</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+
+<!-- ✅ QR Code Library (cdnjs - for generating QR codes) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary:#0a1628; --secondary:#112244; --accent:#0d7c6e; --accent-light:#14a898;
+  --gold:#e8b84b; --gold-light:#f5d07a; --text:#e8edf5; --muted:#8fa3be;
+  --surface:#16243c; --surface2:#1d2f4a; --success:#2ecc71; --danger:#e74c3c;
+  --warning:#f39c12; --info:#3498db; --border:rgba(255,255,255,0.06);
+}
+body { font-family: 'Inter', sans-serif; background: var(--primary); color: var(--text); min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { position: fixed; left:0; top:0; height:100vh; width:260px; background:var(--secondary); border-right:1px solid var(--border); padding:1.5rem; overflow-y:auto; z-index:1000; transition:transform .3s; }
+.sidebar .logo { display:flex; align-items:center; gap:10px; margin-bottom:1.5rem; }
+.sidebar .logo .icon { width:42px; height:42px; background:linear-gradient(135deg,var(--accent),var(--gold)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:1.1rem; }
+.sidebar .logo h1 { font-size:1.15rem; font-weight:700; }
+.sidebar .logo h1 span { color: var(--gold); }
+
+.user-card { background:linear-gradient(135deg, rgba(13,124,110,.2), rgba(232,184,75,.1)); border:1px solid rgba(13,124,110,.3); border-radius:14px; padding:1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:12px; }
+.user-card .avatar { width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--gold)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.2rem; color:#fff; }
+.user-card .info .name { font-weight:700; font-size:.9rem; }
+.user-card .info .role { font-size:.7rem; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+
+.nav-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px; color:var(--muted); cursor:pointer; transition:all .2s; margin-bottom:4px; font-size:.9rem; }
+.nav-item:hover { background:var(--surface); color:var(--text); }
+.nav-item.active { background:var(--accent); color:#fff; }
+.nav-item i { font-size:1.15rem; }
+.nav-item .badge { margin-left:auto; background:var(--danger); color:#fff; font-size:.65rem; padding:2px 8px; border-radius:20px; }
+.nav-item.logout { margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem; color:var(--danger); }
+.nav-item.logout:hover { background:rgba(231,76,60,.1); color:var(--danger); }
+
+/* Main */
+.main { margin-left:260px; padding:2rem; min-height:100vh; }
+.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem; }
+.header h2 { font-weight:700; font-size:1.5rem; }
+.header .subtitle { color:var(--muted); font-size:.9rem; margin-top:4px; }
+
+/* Buttons */
+.btn { padding:10px 20px; border:none; border-radius:12px; font-weight:600; cursor:pointer; transition:all .2s; font-family:'Inter',sans-serif; display:inline-flex; align-items:center; gap:8px; font-size:.85rem; }
+.btn:hover { transform:translateY(-2px); opacity:.9; }
+.btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-gold { background:var(--gold); color:var(--primary); }
+.btn-danger { background:var(--danger); color:#fff; }
+.btn-success { background:var(--success); color:#fff; }
+.btn-info { background:var(--info); color:#fff; }
+.btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.btn-sm { padding:6px 14px; font-size:.75rem; }
+.btn-xs { padding:4px 10px; font-size:.7rem; border-radius:8px; }
+.btn-lg { padding:14px 28px; font-size:1rem; }
+
+/* Stats */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:1rem; margin-bottom:2rem; }
+.stat-card { background:var(--surface); padding:1.25rem; border-radius:16px; border:1px solid var(--border); display:flex; align-items:center; gap:1rem; }
+.stat-card .icon-wrap { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; background:rgba(13,124,110,.15); color:var(--accent-light); flex-shrink:0; }
+.stat-card .icon-wrap.gold { background:rgba(232,184,75,.15); color:var(--gold); }
+.stat-card .icon-wrap.green { background:rgba(46,204,113,.15); color:var(--success); }
+.stat-card .icon-wrap.blue { background:rgba(52,152,219,.15); color:var(--info); }
+.stat-card .number { font-size:1.6rem; font-weight:700; line-height:1; }
+.stat-card .label { color:var(--muted); font-size:.75rem; margin-top:4px; }
+
+/* Panels */
+.panel { display:none; animation:fadeIn .3s ease; }
+.panel.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+.card { background:var(--surface); border-radius:16px; padding:1.5rem; border:1px solid var(--border); margin-bottom:1.5rem; }
+.card h3 { margin-bottom:1rem; display:flex; align-items:center; gap:8px; font-size:1.05rem; }
+.card h3 i { color:var(--gold); }
+
+/* POS Layout */
+.pos-layout { display:grid; grid-template-columns:1fr 420px; gap:1.5rem; }
+.pos-right { background:var(--surface); border-radius:16px; border:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; max-height:calc(100vh - 180px); position:sticky; top:2rem; }
+.pos-student-bar { background:linear-gradient(135deg, rgba(13,124,110,.15), rgba(232,184,75,.08)); border:1px solid rgba(13,124,110,.3); border-radius:14px; padding:1rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+.pos-student-bar .student-info { display:flex; align-items:center; gap:12px; flex:1; min-width:200px; }
+.pos-student-bar .student-info .avatar { width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--gold)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.3rem; color:#fff; }
+.pos-student-bar .student-info .details .name { font-weight:700; font-size:1rem; }
+.pos-student-bar .student-info .details .meta { font-size:.75rem; color:var(--muted); margin-top:2px; }
+
+.pos-search { position:relative; margin-bottom:1rem; }
+.pos-search input { width:100%; padding:14px 16px 14px 48px; background:var(--surface2); border:1px solid var(--border); border-radius:14px; color:var(--text); font-family:'Inter',sans-serif; font-size:.95rem; }
+.pos-search input:focus { outline:none; border-color:var(--accent); }
+.pos-search i { position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:1.2rem; }
+.search-results { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--surface2); border:1px solid var(--border); border-radius:12px; max-height:300px; overflow-y:auto; z-index:100; display:none; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+.search-results.show { display:block; }
+.search-result-item { padding:12px 16px; cursor:pointer; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.search-result-item:last-child { border-bottom:none; }
+.search-result-item:hover { background:rgba(13,124,110,.1); }
+.search-result-item .name { font-weight:600; font-size:.9rem; }
+.search-result-item .meta { font-size:.75rem; color:var(--muted); margin-top:2px; }
+
+.pos-classes-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px; }
+.pos-class-tile { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:1rem; cursor:pointer; transition:all .2s; position:relative; }
+.pos-class-tile:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.2); }
+.pos-class-tile.disabled { opacity:.4; cursor:not-allowed; pointer-events:none; }
+.pos-class-tile .class-tag { display:inline-block; font-size:.6rem; padding:2px 8px; border-radius:20px; background:rgba(232,184,75,.2); color:var(--gold); font-weight:700; text-transform:uppercase; margin-bottom:8px; }
+.pos-class-tile h4 { font-size:.9rem; margin-bottom:6px; }
+.pos-class-tile .meta { font-size:.72rem; color:var(--muted); margin-bottom:8px; }
+.pos-class-tile .price { font-size:1rem; font-weight:700; color:var(--gold); }
+.pos-class-tile .enrolled-badge { position:absolute; top:8px; right:8px; font-size:.6rem; padding:3px 8px; border-radius:20px; background:rgba(46,204,113,.2); color:var(--success); font-weight:700; }
+
+/* Cart */
+.cart-header { padding:1rem 1.25rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.cart-header h3 { font-size:1rem; }
+.cart-header .item-count { background:var(--accent); color:#fff; font-size:.7rem; padding:3px 10px; border-radius:20px; font-weight:700; }
+.cart-items { flex:1; overflow-y:auto; padding:1rem; max-height:300px; }
+.cart-empty { text-align:center; padding:2rem 1rem; color:var(--muted); font-size:.85rem; }
+.cart-empty i { font-size:3rem; opacity:.3; display:block; margin-bottom:1rem; color:var(--accent-light); }
+
+.cart-item { background:var(--surface2); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.cart-item .info { flex:1; min-width:0; }
+.cart-item .info .name { font-weight:600; font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cart-item .info .meta { font-size:.7rem; color:var(--muted); margin-top:2px; }
+.cart-item .price { font-weight:700; color:var(--gold); font-size:.9rem; }
+.cart-item .remove-btn { background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.2rem; padding:0 4px; }
+
+.cart-summary { padding:1rem 1.25rem; border-top:1px solid var(--border); background:var(--surface2); }
+.cart-row { display:flex; justify-content:space-between; padding:6px 0; font-size:.85rem; }
+.cart-row.total { font-size:1.2rem; font-weight:700; color:var(--gold); border-top:2px solid var(--border); margin-top:8px; padding-top:12px; }
+.cart-row.discount { color:var(--warning); }
+
+/* Payment methods */
+.payment-methods { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin:12px 0; }
+.payment-method-btn { padding:10px 6px; background:var(--surface); border:2px solid var(--border); border-radius:10px; color:var(--muted); cursor:pointer; font-size:.7rem; font-weight:600; font-family:'Inter',sans-serif; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.payment-method-btn.active { border-color:var(--accent); background:rgba(13,124,110,.15); color:var(--accent-light); }
+.payment-method-btn i { font-size:1.1rem; }
+
+/* Calculator */
+.amount-input { display:flex; gap:8px; align-items:center; margin:8px 0; }
+.amount-input input { flex:1; padding:12px 14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; font-weight:700; font-family:'Inter',sans-serif; text-align:right; }
+.amount-input input:focus { outline:none; border-color:var(--accent); }
+
+.calc-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px; }
+.calc-btn { padding:12px 8px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); cursor:pointer; font-size:1rem; font-weight:600; font-family:'Inter',sans-serif; }
+.calc-btn:hover { background:var(--surface2); border-color:var(--accent); }
+.calc-btn.op { background:rgba(13,124,110,.15); color:var(--accent-light); }
+.calc-btn.equal { background:var(--accent); color:#fff; grid-column:span 2; }
+.calc-btn.clear { background:rgba(231,76,60,.15); color:var(--danger); }
+
+/* Modal */
+.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(6px); z-index:2000; align-items:center; justify-content:center; padding:1rem; }
+.modal-backdrop.show { display:flex; }
+.modal { background:var(--surface); border-radius:20px; padding:1.75rem; max-width:600px; width:100%; max-height:90vh; overflow-y:auto; border:1px solid var(--border); }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+.modal-header h3 { color:var(--gold-light); }
+.modal .close { background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; }
+.modal .close:hover { color:var(--danger); }
+
+/* Forms */
+.form-group { margin-bottom:1rem; }
+.form-group label { display:block; font-size:.8rem; font-weight:600; color:var(--muted); margin-bottom:6px; }
+.form-group label .req { color:var(--danger); }
+.form-group input, .form-group select, .form-group textarea { width:100%; padding:11px 14px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:'Inter',sans-serif; font-size:.9rem; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:var(--accent); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+/* Receipt */
+.receipt { background:#fff; color:#000; padding:2rem; border-radius:12px; font-family:'Courier New', monospace; max-width:400px; margin:0 auto; }
+.receipt h2 { text-align:center; font-size:1.2rem; margin-bottom:4px; }
+.receipt .receipt-sub { text-align:center; font-size:.75rem; color:#666; margin-bottom:1rem; }
+.receipt .divider { border-top:1px dashed #999; margin:10px 0; }
+.receipt .row { display:flex; justify-content:space-between; font-size:.85rem; padding:3px 0; }
+.receipt .total-row { font-weight:700; font-size:1.1rem; border-top:2px solid #000; padding-top:8px; margin-top:8px; }
+.receipt .footer { text-align:center; font-size:.7rem; color:#666; margin-top:1rem; }
+
+/* QR Card */
+.qr-card { background:#fff; padding:1.5rem; border-radius:12px; text-align:center; color:#000; }
+.qr-card .qr-header { font-weight:700; font-size:1.05rem; color:#0d7c6e; margin-bottom:4px; }
+.qr-card .qr-sub { font-size:.75rem; color:#666; margin-bottom:1rem; }
+.qr-card .qr-canvas-wrap { display:flex; justify-content:center; margin:1rem 0; }
+.qr-card .qr-canvas-wrap canvas,
+.qr-card .qr-canvas-wrap img { display:block; max-width:100%; }
+.qr-card .qr-name { font-weight:700; font-size:1.1rem; margin-bottom:4px; }
+.qr-card .qr-code-num { font-family:monospace; font-size:.85rem; color:#0d7c6e; font-weight:700; }
+.qr-card .qr-hint { font-size:.7rem; color:#888; margin-top:.75rem; }
+
+/* Alerts */
+.alert { padding:12px 16px; border-radius:10px; margin-bottom:1rem; display:none; font-size:.85rem; align-items:center; gap:10px; }
+.alert.show { display:flex; }
+.alert-success { background:rgba(46,204,113,.15); border:1px solid var(--success); color:var(--success); }
+.alert-error { background:rgba(231,76,60,.15); border:1px solid var(--danger); color:var(--danger); }
+.alert-info { background:rgba(52,152,219,.15); border:1px solid var(--info); color:var(--info); }
+.alert-warning { background:rgba(243,156,18,.15); border:1px solid var(--warning); color:var(--warning); }
+
+/* Table */
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:.85rem; }
+th, td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--border); }
+th { color:var(--muted); font-weight:600; font-size:.7rem; text-transform:uppercase; }
+tbody tr:hover { background:rgba(13,124,110,.05); }
+
+/* Physical Scanner */
+.scanner-input-wrap { position:relative; }
+.scanner-input {
+  width:100%; padding:20px 60px 20px 20px;
+  background:var(--primary);
+  border:3px solid var(--accent);
+  border-radius:16px;
+  color:var(--text);
+  font-family:'Courier New', monospace;
+  font-size:1.3rem;
+  letter-spacing:2px;
+  text-align:center;
+  font-weight:700;
+  transition:all 0.3s;
+}
+.scanner-input:focus {
+  outline:none;
+  border-color:var(--accent-light);
+  box-shadow:0 0 0 6px rgba(20,168,152,0.2);
+  background:rgba(13,124,110,0.05);
+}
+.scanner-input::placeholder {
+  color:var(--muted);
+  font-size:0.9rem;
+  letter-spacing:0;
+  font-weight:400;
+  font-family:'Inter',sans-serif;
+}
+.scanner-input-wrap .scanner-icon {
+  position:absolute; right:20px; top:50%;
+  transform:translateY(-50%);
+  font-size:1.8rem;
+  color:var(--accent-light);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity:1; }
+  50% { opacity:0.4; }
+}
+.scanner-input-wrap .scanner-icon.scanning {
+  animation:scanPulse 0.5s infinite;
+  color:var(--success);
+}
+@keyframes scanPulse {
+  0%, 100% { transform:translateY(-50%) scale(1); }
+  50% { transform:translateY(-50%) scale(1.3); }
+}
+.scanner-status {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:0.75rem;
+  font-weight:700;
+}
+.scanner-status.ready {
+  background:rgba(46,204,113,0.2);
+  color:var(--success);
+}
+.scanner-status.ready::before {
+  content:'';
+  width:8px; height:8px;
+  background:var(--success);
+  border-radius:50%;
+  animation:pulse 1.5s infinite;
+}
+
+/* Scan Result Display */
+.scan-result-card {
+  animation:slideIn 0.3s ease;
+  padding:1.5rem;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  margin-top:1rem;
+}
+.scan-result-card.success {
+  background:linear-gradient(135deg, rgba(46,204,113,.15), rgba(13,124,110,.1));
+  border:2px solid var(--success);
+}
+.scan-result-card.error {
+  background:linear-gradient(135deg, rgba(231,76,60,.15), rgba(200,50,40,.1));
+  border:2px solid var(--danger);
+}
+.scan-result-card .result-icon {
+  font-size:3rem;
+  flex-shrink:0;
+}
+.scan-result-card .result-body { flex:1; min-width:0; }
+.scan-result-card .result-name {
+  font-weight:700;
+  font-size:1.2rem;
+  margin-bottom:4px;
+}
+.scan-result-card.success .result-name { color:var(--success); }
+.scan-result-card.error .result-name { color:var(--danger); }
+.scan-result-card .result-meta {
+  font-size:0.85rem;
+  color:var(--muted);
+  line-height:1.6;
+}
+.scan-result-card .result-meta strong {
+  color:var(--text);
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(-10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Recent Scans */
+.recent-scan-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 14px;
+  background:var(--surface2);
+  border-radius:10px;
+  margin-bottom:6px;
+  border-left:4px solid var(--success);
+  animation:slideIn 0.3s ease;
+}
+.recent-scan-item.error {
+  border-left-color:var(--danger);
+}
+.recent-scan-item .scan-info { flex:1; min-width:0; }
+.recent-scan-item .scan-name {
+  font-weight:600;
+  font-size:0.85rem;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.recent-scan-item .scan-time {
+  font-size:0.7rem;
+  color:var(--muted);
+  margin-top:2px;
+}
+.recent-scan-item .scan-badge {
+  font-size:0.65rem;
+  padding:3px 10px;
+  border-radius:20px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.recent-scan-item .scan-badge.present {
+  background:rgba(46,204,113,.2);
+  color:var(--success);
+}
+.recent-scan-item .scan-badge.absent {
+  background:rgba(231,76,60,.2);
+  color:var(--danger);
+}
+.recent-scan-item .scan-badge.late {
+  background:rgba(243,156,18,.2);
+  color:var(--warning);
+}
+.recent-scan-item .scan-badge.error {
+  background:rgba(231,76,60,.2);
+  color:var(--danger);
+}
+
+/* Empty */
+.empty-state { text-align:center; padding:2rem 1rem; color:var(--muted); font-size:.9rem; }
+.empty-state i { font-size:3rem; display:block; margin-bottom:.75rem; opacity:.4; color:var(--accent-light); }
+.empty-state strong { display:block; color:var(--text); margin-bottom:4px; font-size:1rem; }
+
+/* Mobile */
+.mobile-toggle { display:none; position:fixed; top:1rem; left:1rem; z-index:1001; background:var(--surface); border:1px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px; cursor:pointer; }
+@media (max-width:968px) {
+  .pos-layout { grid-template-columns:1fr; }
+  .pos-right { position:static; max-height:none; }
+}
+@media (max-width:768px) {
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:translateX(0); }
+  .main { margin-left:0; padding:1rem; padding-top:4rem; }
+  .mobile-toggle { display:flex; }
+  .form-row { grid-template-columns:1fr; }
+}
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--primary); }
+::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="icon">Fx</div>
+    <h1>Flux <span>Academic</span></h1>
+  </div>
+  <div class="user-card">
+    <div class="avatar" id="staffAvatar">S</div>
+    <div class="info">
+      <div class="name" id="staffName">Reception</div>
+      <div class="role">🎫 Receptionist</div>
+    </div>
+  </div>
+
+  <div class="nav-item active" onclick="showPanel('overview')" id="nav-overview">
+    <i class="ti ti-dashboard"></i> Overview
+  </div>
+  <div class="nav-item" onclick="showPanel('pos')" id="nav-pos">
+    <i class="ti ti-shopping-cart"></i> POS / New Sale
+  </div>
+  <div class="nav-item" onclick="showPanel('register')" id="nav-register">
+    <i class="ti ti-user-plus"></i> Register Student
+  </div>
+  <div class="nav-item" onclick="showPanel('students')" id="nav-students">
+    <i class="ti ti-users"></i> Search Students
+  </div>
+  <div class="nav-item" onclick="showPanel('scan')" id="nav-scan">
+    <i class="ti ti-barcode"></i> Attendance Scanner
+  </div>
+  <div class="nav-item" onclick="showPanel('attendance')" id="nav-attendance">
+    <i class="ti ti-checklist"></i> Today's Attendance
+  </div>
+  <div class="nav-item" onclick="showPanel('sales')" id="nav-sales">
+    <i class="ti ti-receipt"></i> Sales History
+  </div>
+  <div class="nav-item" onclick="showPanel('inquiries')" id="nav-inquiries">
+    <i class="ti ti-phone"></i> Inquiries
+    <span class="badge" id="inquiryBadge" style="display:none;">0</span>
+  </div>
+  <div class="nav-item logout" onclick="logout()">
+    <i class="ti ti-logout"></i> Logout
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="header">
+    <div>
+      <h2 id="panelTitle">Overview</h2>
+      <div class="subtitle" id="panelSubtitle">Today's activity at a glance</div>
+    </div>
+    <button class="btn btn-gold" onclick="showPanel('pos')">
+      <i class="ti ti-shopping-cart"></i> New Sale
+    </button>
+  </div>
+
+  <div id="alertMessage" class="alert"></div>
+
+  <!-- OVERVIEW -->
+  <div class="panel active" id="panel-overview">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon-wrap green"><i class="ti ti-user-plus"></i></div>
+        <div><div class="number" id="statTodayStudents">0</div><div class="label">New Students Today</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap gold"><i class="ti ti-currency-dollar"></i></div>
+        <div><div class="number" id="statTodaySales">LKR 0</div><div class="label">Today's Sales</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap blue"><i class="ti ti-shopping-cart"></i></div>
+        <div><div class="number" id="statSalesCount">0</div><div class="label">Sales Today</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap"><i class="ti ti-qrcode"></i></div>
+        <div><div class="number" id="statTodayAtt">0</div><div class="label">Attendance Today</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap green"><i class="ti ti-users"></i></div>
+        <div><div class="number" id="statTotalStudents">0</div><div class="label">Total Students</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap gold"><i class="ti ti-phone"></i></div>
+        <div><div class="number" id="statInquiries">0</div><div class="label">New Inquiries</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><i class="ti ti-clock"></i> Recent Sales</h3>
+      <div id="recentSalesList"><p style="color:var(--muted);">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- POS -->
+  <div class="panel" id="panel-pos">
+    <div class="pos-layout">
+      <div class="pos-left">
+        <div class="pos-student-bar" id="posStudentBar">
+          <div class="student-info">
+            <div class="avatar">?</div>
+            <div class="details">
+              <div class="name">Walk-in Customer</div>
+              <div class="meta">Search existing student or leave blank for guest</div>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="clearStudent()">
+            <i class="ti ti-x"></i> Clear
+          </button>
+        </div>
+
+        <div class="pos-search">
+          <i class="ti ti-search"></i>
+          <input type="text" id="posSearchInput" placeholder="Search by card number, name, phone, or email..." autocomplete="off">
+          <div class="search-results" id="posSearchResults"></div>
+        </div>
+
+        <div class="card">
+          <h3><i class="ti ti-book"></i> Select Classes</h3>
+          <div class="pos-classes-grid" id="posClassesGrid">
+            <p style="color:var(--muted);">Loading classes...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pos-right">
+        <div class="cart-header">
+          <h3>🛒 Bill</h3>
+          <span class="item-count" id="cartCount">0 items</span>
+        </div>
+
+        <div class="cart-items" id="cartItems">
+          <div class="cart-empty">
+            <i class="ti ti-shopping-cart-off"></i>
+            Click a class to add to bill
+          </div>
+        </div>
+
+        <div class="cart-summary">
+          <div class="cart-row">
+            <span>Subtotal</span>
+            <span id="cartSubtotal">LKR 0</span>
+          </div>
+          <div class="cart-row discount">
+            <span>Discount</span>
+            <span id="cartDiscount">LKR 0</span>
+          </div>
+          <div class="cart-row total">
+            <span>Total</span>
+            <span id="cartTotal">LKR 0</span>
+          </div>
+
+          <div class="payment-methods">
+            <button class="payment-method-btn active" data-method="cash" onclick="selectPaymentMethod('cash')">
+              <i class="ti ti-cash"></i>
+              <span>Cash</span>
+            </button>
+            <button class="payment-method-btn" data-method="card" onclick="selectPaymentMethod('card')">
+              <i class="ti ti-credit-card"></i>
+              <span>Card</span>
+            </button>
+            <button class="payment-method-btn" data-method="bank_transfer" onclick="selectPaymentMethod('bank_transfer')">
+              <i class="ti ti-building-bank"></i>
+              <span>Bank</span>
+            </button>
+          </div>
+
+          <div id="cashCalc" style="display:none;">
+            <label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:6px;">Amount Paid (LKR)</label>
+            <div class="amount-input">
+              <input type="text" id="amountPaid" placeholder="0.00" readonly>
+            </div>
+            <div class="calc-grid">
+              <button class="calc-btn" onclick="calcNum('7')">7</button>
+              <button class="calc-btn" onclick="calcNum('8')">8</button>
+              <button class="calc-btn" onclick="calcNum('9')">9</button>
+              <button class="calc-btn op" onclick="calcNum('')">÷</button>
+              <button class="calc-btn" onclick="calcNum('4')">4</button>
+              <button class="calc-btn" onclick="calcNum('5')">5</button>
+              <button class="calc-btn" onclick="calcNum('6')">6</button>
+              <button class="calc-btn op" onclick="calcNum('')">×</button>
+              <button class="calc-btn" onclick="calcNum('1')">1</button>
+              <button class="calc-btn" onclick="calcNum('2')">2</button>
+              <button class="calc-btn" onclick="calcNum('3')">3</button>
+              <button class="calc-btn op" onclick="calcNum('')">−</button>
+              <button class="calc-btn" onclick="calcNum('0')">0</button>
+              <button class="calc-btn" onclick="calcNum('.')">.</button>
+              <button class="calc-btn" onclick="calcExact()">= Exact</button>
+              <button class="calc-btn op" onclick="calcNum('')">+</button>
+              <button class="calc-btn clear" onclick="calcClear()">AC</button>
+              <button class="calc-btn" onclick="calcBack()">⌫</button>
+              <button class="calc-btn equal" onclick="calcEquals()">=</button>
+            </div>
+            <div style="margin-top:8px;font-size:.8rem;color:var(--muted);text-align:right;">
+              Change: <strong id="changeAmt" style="color:var(--gold);font-size:1rem;">LKR 0</strong>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" onclick="completeSale()" id="completeSaleBtn" style="width:100%;justify-content:center;margin-top:1rem;">
+            <i class="ti ti-check"></i> Complete Sale
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTER STUDENT -->
+  <div class="panel" id="panel-register">
+    <div class="card" style="max-width:700px;">
+      <h3><i class="ti ti-user-plus"></i> Register New Student</h3>
+      <div class="alert alert-info show" style="margin-bottom:1rem;">
+        <i class="ti ti-info-circle"></i> New student ට QR code එකක් auto-generate වේවි. Print කරලා දෙන්න.
+      </div>
+      <div id="registerAlert" class="alert"></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" id="regFname" placeholder="Kamal">
+        </div>
+        <div class="form-group">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" id="regLname" placeholder="Perera">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" id="regEmail" placeholder="kamal@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone <span class="req">*</span></label>
+          <input type="tel" id="regPhone" placeholder="0771234567">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Username <span class="req">*</span></label>
+          <input type="text" id="regUsername" placeholder="kamal">
+        </div>
+        <div class="form-group">
+          <label>Password <span class="req">*</span></label>
+          <input type="text" id="regPassword" placeholder="Min 6 chars">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Program</label>
+        <select id="regProgram">
+          <option>A/L 2026 Batch</option>
+          <option>A/L 2027 Batch</option>
+          <option>A/L 2028 Batch</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="generateRandomCredentials()">
+          <i class="ti ti-refresh"></i> Auto-generate credentials
+        </button>
+      </div>
+
+      <button class="btn btn-primary btn-lg" onclick="registerStudent()" id="registerBtn" style="width:100%;justify-content:center;margin-top:1rem;">
+        <i class="ti ti-user-plus"></i> Register & Generate QR
+      </button>
+    </div>
+  </div>
+
+  <!-- SEARCH STUDENTS -->
+  <div class="panel" id="panel-students">
+    <div class="card">
+      <h3><i class="ti ti-users"></i> Search Students</h3>
+      <div class="pos-search">
+        <i class="ti ti-search"></i>
+        <input type="text" id="studentSearchInput" placeholder="Search by name, card, email, or phone..." oninput="debouncedStudentSearch()">
+      </div>
+      <div id="studentSearchResults"><p style="color:var(--muted);">Start typing to search...</p></div>
+    </div>
+  </div>
+
+  <!-- PHYSICAL SCANNER ATTENDANCE -->
+  <div class="panel" id="panel-scan">
+    <div class="card" style="max-width:800px;margin:0 auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+        <h3 style="margin:0;"><i class="ti ti-barcode"></i> Attendance Scanner</h3>
+        <span class="scanner-status ready" id="scannerStatus">READY</span>
+      </div>
+
+      <!-- Instructions -->
+      <div class="alert alert-info show" style="margin-bottom:1.5rem;">
+        <i class="ti ti-info-circle" style="font-size:1.2rem;"></i>
+        <div>
+          <strong style="display:block;margin-bottom:6px;">📡 Physical QR Scanner Instructions</strong>
+          <ol style="margin:0 0 0 20px;font-size:0.85rem;line-height:1.8;">
+            <li>පහළින් Class එකක් select කරන්න</li>
+            <li>Scanner input box එකේ <strong>cursor එක auto-focus</strong> වෙලා තියෙනවා</li>
+            <li>Student's QR code එක <strong>physical scanner machine</strong> එකෙන් scan කරන්න</li>
+            <li>Attendance <strong>automatic mark</strong> වේවි ✅</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Class Selector -->
+      <div class="form-group">
+        <label>Select Class <span class="req">*</span></label>
+        <select id="scannerClassId" onchange="onScannerClassChange()">
+          <option value="">-- Select class --</option>
+        </select>
+      </div>
+
+      <!-- Scanner Input -->
+      <div class="form-group">
+        <label style="color:var(--accent-light);font-size:0.9rem;display:flex;align-items:center;gap:8px;">
+          <i class="ti ti-barcode"></i>
+          Scan QR Code Here
+        </label>
+        <div class="scanner-input-wrap">
+          <input type="text"
+                 id="scannerInput"
+                 class="scanner-input"
+                 placeholder="Ready to scan..."
+                 autocomplete="off"
+                 autofocus>
+          <i class="ti ti-barcode scanner-icon" id="scannerIcon"></i>
+        </div>
+        <span style="display:block;margin-top:10px;font-size:0.75rem;color:var(--muted);text-align:center;">
+          <i class="ti ti-bulb"></i>
+          Tip: Scanner එකට Enter key auto-send වෙන්න configure කරන්න. නැත්නම් Enter key manually ඔබන්න.
+        </span>
+      </div>
+
+      <!-- Scan Result -->
+      <div id="scannerResult" style="margin-top:1.5rem;"></div>
+
+      <!-- Session Stats -->
+      <div id="scannerStats" style="display:none;margin-top:1.5rem;padding:1rem;background:var(--surface2);border-radius:12px;">
+        <div style="display:flex;justify-content:space-around;text-align:center;">
+          <div>
+            <div style="font-size:1.5rem;font-weight:700;color:var(--success);" id="sessionPresent">0</div>
+            <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;">Present</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:700;color:var(--warning);" id="sessionLate">0</div>
+            <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;">Late</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:700;color:var(--danger);" id="sessionFailed">0</div>
+            <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;">Failed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Scans -->
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h4 style="margin:0;font-size:0.95rem;color:var(--gold);display:flex;align-items:center;gap:8px;">
+            <i class="ti ti-history"></i> Recent Scans (This Session)
+          </h4>
+          <button class="btn btn-ghost btn-xs" onclick="clearRecentScans()">
+            <i class="ti ti-trash"></i> Clear
+          </button>
+        </div>
+        <div id="recentScans" style="max-height:300px;overflow-y:auto;">
+          <p style="color:var(--muted);font-size:.85rem;text-align:center;padding:1.5rem;">
+            <i class="ti ti-scan" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.4;"></i>
+            No scans yet this session
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TODAY'S ATTENDANCE -->
+  <div class="panel" id="panel-attendance">
+    <div class="card">
+      <h3><i class="ti ti-checklist"></i> Today's Attendance</h3>
+      <button class="btn btn-primary btn-sm" onclick="loadTodayAttendance()" style="margin-bottom:1rem;">
+        <i class="ti ti-refresh"></i> Refresh
+      </button>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Time</th><th>Student</th><th>Card</th><th>Class</th><th>Status</th><th>Method</th></tr>
+          </thead>
+          <tbody id="todayAttendanceList">
+            <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SALES HISTORY -->
+  <div class="panel" id="panel-sales">
+    <div class="card">
+      <h3><i class="ti ti-receipt"></i> Sales History</h3>
+      <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;">
+        <input type="date" id="salesDateFilter" style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);" onchange="loadRecentSales()">
+        <button class="btn btn-primary btn-sm" onclick="loadRecentSales()"><i class="ti ti-refresh"></i> Refresh</button>
+      </div>
+      <div id="salesSummary" style="margin-bottom:1rem;"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Receipt</th><th>Time</th><th>Student</th><th>Items</th><th>Total</th><th>Payment</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="salesHistoryList">
+            <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- INQUIRIES -->
+  <div class="panel" id="panel-inquiries">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:10px;">
+        <h3 style="margin:0;"><i class="ti ti-phone"></i> Inquiries</h3>
+        <button class="btn btn-primary btn-sm" onclick="openInquiryModal()">
+          <i class="ti ti-plus"></i> New Inquiry
+        </button>
+      </div>
+      <div id="inquiriesList"><p style="color:var(--muted);">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="modal-backdrop" id="receiptModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h3><i class="ti ti-receipt"></i> Receipt</h3>
+      <button class="close" onclick="closeModal('receiptModal')">✕</button>
+    </div>
+    <div id="receiptContent"></div>
+    <div style="display:flex;gap:10px;margin-top:1rem;">
+      <button class="btn btn-primary" onclick="printReceipt()" style="flex:1;justify-content:center;">
+        <i class="ti ti-printer"></i> Print
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('receiptModal')" style="flex:1;justify-content:center;">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- QR CODE MODAL -->
+<div class="modal-backdrop" id="qrModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <h3><i class="ti ti-qrcode"></i> Student QR Code</h3>
+      <button class="close" onclick="closeModal('qrModal')">✕</button>
+    </div>
+    <div id="qrContent"></div>
+    <div style="display:flex;gap:10px;margin-top:1rem;">
+      <button class="btn btn-primary" onclick="printQR()" style="flex:1;justify-content:center;">
+        <i class="ti ti-printer"></i> Print QR Card
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('qrModal')" style="flex:1;justify-content:center;">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT DETAILS MODAL -->
+<div class="modal-backdrop" id="studentModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <h3><i class="ti ti-user"></i> Student Details</h3>
+      <button class="close" onclick="closeModal('studentModal')">✕</button>
+    </div>
+    <div id="studentModalContent"></div>
+  </div>
+</div>
+
+<!-- INQUIRY MODAL -->
+<div class="modal-backdrop" id="inquiryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="ti ti-phone"></i> New Inquiry</h3>
+      <button class="close" onclick="closeModal('inquiryModal')">✕</button>
+    </div>
+    <input type="hidden" id="inquiryId">
+    <div class="form-group">
+      <label>Full Name <span class="req">*</span></label>
+      <input type="text" id="inquiryName">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone <span class="req">*</span></label>
+        <input type="tel" id="inquiryPhone">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="inquiryEmail">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Subject Interest</label>
+      <select id="inquirySubject">
+        <option value="">-- Select --</option>
+        <option>Biology</option>
+        <option>Combined Maths</option>
+        <option>Physics</option>
+        <option>Chemistry</option>
+        <option>Multiple</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Message / Notes</label>
+      <textarea id="inquiryMessage" rows="3"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveInquiry()" style="width:100%;justify-content:center;">
+      <i class="ti ti-check"></i> Save
+    </button>
+  </div>
+</div>
+
+<script>
+// ============================================
+// GLOBAL STATE
+// ============================================
+let currentUser = null;
+let allClasses = [];
+let cart = [];
+let selectedStudent = null;
+let selectedPaymentMethod = 'cash';
+let amountPaidValue = 0;
+let amountPaidStr = '';
+let currentQRData = null;
+
+// Scanner session state
+let sessionStats = { present: 0, late: 0, failed: 0 };
+let recentScans = [];
+const MAX_RECENT_SCANS = 50;
+let lastScanTime = 0;
+let lastScanValue = '';
+
+// ============================================
+// API HELPER
+// ============================================
+async function apiRequest(action, method = 'POST', data = {}) {
+    const fd = new URLSearchParams();
+    fd.append('action', action);
+    if (currentUser && currentUser.id) fd.append('staff_id', currentUser.id);
+    for (let k in data) fd.append(k, data[k]);
+    try {
+        const r = await fetch('backend_reception.php', {
+            method, headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: fd.toString()
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return await r.json();
+    } catch (e) {
+        console.error('API error:', e);
+        return { success: false, message: 'Connection error' };
+    }
+}
+
+// ============================================
+// INIT
+// ============================================
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+function showPanel(panel) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + panel).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('nav-' + panel).classList.add('active');
+
+    const titles = {
+        overview: ['Overview', "Today's activity at a glance"],
+        pos: ['POS / New Sale', 'Add classes and complete payment'],
+        register: ['Register Student', 'Create new student account + QR'],
+        students: ['Search Students', 'Find and view student details'],
+        scan: ['Attendance Scanner', 'Use physical scanner machine to mark attendance'],
+        attendance: ["Today's Attendance", 'Attendance recorded today'],
+        sales: ['Sales History', 'All POS transactions'],
+        inquiries: ['Inquiries', 'Phone & walk-in inquiries']
+    };
+    document.getElementById('panelTitle').textContent = titles[panel][0];
+    document.getElementById('panelSubtitle').textContent = titles[panel][1];
+
+    if (panel === 'overview') loadOverview();
+    if (panel === 'pos') { loadClassesForPOS(); }
+    if (panel === 'scan') {
+        loadClassesForScanner();
+        setTimeout(focusScannerInput, 400);
+    }
+    if (panel === 'attendance') loadTodayAttendance();
+    if (panel === 'sales') loadRecentSales();
+    if (panel === 'inquiries') loadInquiries();
+
+    document.getElementById('sidebar').classList.remove('open');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function checkAuth() {
+    const stored = localStorage.getItem('fluxReception');
+    if (stored) {
+        try {
+            currentUser = JSON.parse(stored);
+            if (currentUser.role !== 'reception') {
+                localStorage.removeItem('fluxReception');
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+            renderStaffProfile();
+            loadOverview();
+            return true;
+        } catch (e) { localStorage.removeItem('fluxReception'); }
+    }
+    window.location.href = 'admin-login.html';
+    return false;
+}
+
+function renderStaffProfile() {
+    const fn = currentUser.first_name || 'R';
+    document.getElementById('staffName').textContent = `${fn} ${currentUser.last_name || ''}`;
+    document.getElementById('staffAvatar').textContent = fn.charAt(0).toUpperCase();
+}
+
+function logout() {
+    if (!confirm('Logout?')) return;
+    localStorage.removeItem('fluxReception');
+    window.location.href = 'admin-login.html';
+}
+
+// ============================================
+// OVERVIEW
+// ============================================
+async function loadOverview() {
+    const r = await apiRequest('reception_overview');
+    if (!r.success) return;
+    const d = r.data;
+    document.getElementById('statTodayStudents').textContent = d.today_students || 0;
+    document.getElementById('statTodaySales').textContent = 'LKR ' + (d.today_sales_amount || 0).toLocaleString();
+    document.getElementById('statSalesCount').textContent = d.today_sales_count || 0;
+    document.getElementById('statTodayAtt').textContent = d.today_attendance || 0;
+    document.getElementById('statTotalStudents').textContent = d.total_students || 0;
+    document.getElementById('statInquiries').textContent = d.new_inquiries || 0;
+
+    if (d.new_inquiries > 0) {
+        const b = document.getElementById('inquiryBadge');
+        b.textContent = d.new_inquiries;
+        b.style.display = 'inline-block';
+    }
+
+    const rs = await apiRequest('pos_recent_sales');
+    if (rs.success && rs.data) {
+        const container = document.getElementById('recentSalesList');
+        if (rs.data.length === 0) {
+            container.innerHTML = '<p class="empty-state">No sales yet</p>';
+        } else {
+            container.innerHTML = rs.data.slice(0, 5).map(s => `
+                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+                    <div>
+                        <div style="font-weight:600;">${s.student_name}</div>
+                        <div style="font-size:.75rem;color:var(--muted);">${s.receipt_number} · ${new Date(s.created_at).toLocaleString()}</div>
+                    </div>
+                    <div style="font-weight:700;color:var(--gold);">LKR ${parseFloat(s.total).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+// ============================================
+// POS
+// ============================================
+async function loadClassesForPOS() {
+    const r = await apiRequest('get_all_classes');
+    if (!r.success) return;
+    allClasses = r.data || [];
+    renderPOSClasses();
+}
+
+function renderPOSClasses() {
+    const container = document.getElementById('posClassesGrid');
+    if (allClasses.length === 0) {
+        container.innerHTML = '<p class="empty-state">No active classes</p>';
+        return;
+    }
+    container.innerHTML = allClasses.map(c => {
+        const inCart = cart.some(i => i.class_id === c.id);
+        return `
+            <div class="pos-class-tile ${inCart ? 'disabled' : ''}" onclick="addToCart(${c.id})">
+                ${inCart ? '<span class="enrolled-badge">✓ In Cart</span>' : ''}
+                <div class="class-tag">${c.subject}</div>
+                <h4>${c.name}</h4>
+                <div class="meta">${c.year} · ${c.schedule || 'TBA'}</div>
+                <div class="meta" style="font-size:.7rem;">Enrolled: ${c.enrolled || 0}/${c.capacity || 50}</div>
+                <div class="price">LKR ${parseFloat(c.price).toLocaleString()}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function debounce(fn, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const posSearch = document.getElementById('posSearchInput');
+    if (posSearch) {
+        posSearch.addEventListener('input', debounce(async (e) => {
+            const q = e.target.value.trim();
+            const results = document.getElementById('posSearchResults');
+            if (q.length < 2) { results.classList.remove('show'); return; }
+            const r = await apiRequest('pos_search_student', 'POST', { query: q });
+            if (!r.success || !r.data.length) {
+                results.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:.85rem;">No students found</div>';
+            } else {
+                results.innerHTML = r.data.map(s => `
+                    <div class="search-result-item" onclick="selectPOSStudent(${s.id})">
+                        <div>
+                            <div class="name">${s.first_name} ${s.last_name}</div>
+                            <div class="meta">${s.card_number || 'No card'} · ${s.phone || 'No phone'} · ${s.enrolled_count} classes</div>
+                        </div>
+                        <i class="ti ti-chevron-right"></i>
+                    </div>
+                `).join('');
+            }
+            results.classList.add('show');
+        }, 300));
+    }
+});
+
+async function selectPOSStudent(id) {
+    const detailR = await apiRequest('get_student_details', 'POST', { student_id: id });
+    if (!detailR.success) return;
+    selectedStudent = detailR.data;
+
+    const bar = document.getElementById('posStudentBar');
+    const initial = selectedStudent.first_name.charAt(0).toUpperCase();
+    bar.innerHTML = `
+        <div class="student-info">
+            <div class="avatar">${initial}</div>
+            <div class="details">
+                <div class="name">${selectedStudent.first_name} ${selectedStudent.last_name}</div>
+                <div class="meta">${selectedStudent.card_number || ''} · ${selectedStudent.phone || ''} · ${selectedStudent.enrollments.length} classes</div>
+            </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="clearStudent()">
+            <i class="ti ti-x"></i> Clear
+        </button>
+    `;
+    document.getElementById('posSearchResults').classList.remove('show');
+    document.getElementById('posSearchInput').value = '';
+}
+
+function clearStudent() {
+    selectedStudent = null;
+    const bar = document.getElementById('posStudentBar');
+    bar.innerHTML = `
+        <div class="student-info">
+            <div class="avatar">?</div>
+            <div class="details">
+                <div class="name">Walk-in Customer</div>
+                <div class="meta">Search existing student or leave blank for guest</div>
+            </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="clearStudent()">
+            <i class="ti ti-x"></i> Clear
+        </button>
+    `;
+}
+
+function addToCart(classId) {
+    const cls = allClasses.find(c => c.id === classId);
+    if (!cls) return;
+    if (cart.some(i => i.class_id === classId)) return;
+
+    if (selectedStudent && selectedStudent.enrollments) {
+        const already = selectedStudent.enrollments.find(e => e.class_id === classId && e.status === 'active');
+        if (already) {
+            showAlert(`${selectedStudent.first_name} already enrolled in ${cls.name}`, 'warning');
+            return;
+        }
+    }
+
+    cart.push({
+        class_id: cls.id,
+        class_name: cls.name,
+        subject: cls.subject,
+        year: cls.year,
+        unit_price: parseFloat(cls.price),
+        line_total: parseFloat(cls.price)
+    });
+
+    renderCart();
+    renderPOSClasses();
+}
+
+function removeFromCart(classId) {
+    cart = cart.filter(i => i.class_id !== classId);
+    renderCart();
+    renderPOSClasses();
+}
+
+function renderCart() {
+    const container = document.getElementById('cartItems');
+    const countEl = document.getElementById('cartCount');
+
+    if (cart.length === 0) {
+        container.innerHTML = `
+            <div class="cart-empty">
+                <i class="ti ti-shopping-cart-off"></i>
+                Click a class to add to bill
+            </div>
+        `;
+        countEl.textContent = '0 items';
+        document.getElementById('cartSubtotal').textContent = 'LKR 0';
+        document.getElementById('cartDiscount').textContent = 'LKR 0';
+        document.getElementById('cartTotal').textContent = 'LKR 0';
+        updateChange();
+        return;
+    }
+
+    container.innerHTML = cart.map(i => `
+        <div class="cart-item">
+            <div class="info">
+                <div class="name">${i.class_name}</div>
+                <div class="meta">${i.subject} · ${i.year}</div>
+            </div>
+            <div class="price">LKR ${i.line_total.toLocaleString()}</div>
+            <button class="remove-btn" onclick="removeFromCart(${i.class_id})">
+                <i class="ti ti-x"></i>
+            </button>
+        </div>
+    `).join('');
+
+    const subtotal = cart.reduce((s, i) => s + i.line_total, 0);
+    countEl.textContent = cart.length + ' item' + (cart.length !== 1 ? 's' : '');
+    document.getElementById('cartSubtotal').textContent = 'LKR ' + subtotal.toLocaleString();
+    document.getElementById('cartDiscount').textContent = 'LKR 0';
+    document.getElementById('cartTotal').textContent = 'LKR ' + subtotal.toLocaleString();
+    updateChange();
+}
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    document.querySelectorAll('.payment-method-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.method === method);
+    });
+    document.getElementById('cashCalc').style.display = method === 'cash' ? 'block' : 'none';
+    if (method === 'cash') calcClear();
+}
+
+function calcNum(n) {
+    if (n === '.') {
+        if (amountPaidStr.includes('.')) return;
+        if (amountPaidStr === '') amountPaidStr = '0';
+    }
+    amountPaidStr += n;
+    amountPaidValue = parseFloat(amountPaidStr) || 0;
+    document.getElementById('amountPaid').value = amountPaidStr || '0';
+    updateChange();
+}
+
+function calcBack() {
+    amountPaidStr = amountPaidStr.slice(0, -1);
+    amountPaidValue = parseFloat(amountPaidStr) || 0;
+    document.getElementById('amountPaid').value = amountPaidStr || '0';
+    updateChange();
+}
+
+function calcClear() {
+    amountPaidStr = '';
+    amountPaidValue = 0;
+    document.getElementById('amountPaid').value = '0';
+    updateChange();
+}
+
+function calcExact() {
+    const total = cart.reduce((s, i) => s + i.line_total, 0);
+    amountPaidStr = String(total);
+    amountPaidValue = total;
+    document.getElementById('amountPaid').value = amountPaidStr;
+    updateChange();
+}
+
+function calcEquals() { updateChange(); }
+
+function updateChange() {
+    const total = cart.reduce((s, i) => s + i.line_total, 0);
+    const change = Math.max(0, amountPaidValue - total);
+    document.getElementById('changeAmt').textContent = 'LKR ' + change.toLocaleString();
+}
+
+async function completeSale() {
+    if (cart.length === 0) { showAlert('Cart is empty', 'error'); return; }
+
+    const total = cart.reduce((s, i) => s + i.line_total, 0);
+    let studentId = selectedStudent ? selectedStudent.id : 0;
+    let studentName = selectedStudent ? (selectedStudent.first_name + ' ' + selectedStudent.last_name) : '';
+    let studentPhone = selectedStudent ? (selectedStudent.phone || '') : '';
+    let studentEmail = selectedStudent ? (selectedStudent.email || '') : '';
+
+    if (!studentId) {
+        const nameInput = prompt('Walk-in customer name (required for guest sale):');
+        if (!nameInput || !nameInput.trim()) {
+            showAlert('Please select a student or enter walk-in name', 'error');
+            return;
+        }
+        studentName = nameInput.trim();
+    }
+
+    if (selectedPaymentMethod === 'cash' && amountPaidValue < total) {
+        showAlert('Amount paid is less than total', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('completeSaleBtn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Processing...';
+    btn.disabled = true;
+
+    try {
+        const payload = {
+            student_id: studentId,
+            student_name: studentName,
+            student_phone: studentPhone,
+            student_email: studentEmail,
+            items: JSON.stringify(cart),
+            payment_method: selectedPaymentMethod,
+            amount_paid: selectedPaymentMethod === 'cash' ? amountPaidValue : total,
+            discount: 0,
+            cashier_id: currentUser.id
+        };
+
+        const r = await apiRequest('pos_create_sale', 'POST', payload);
+        if (r.success) {
+            showReceipt(r.data);
+            cart = [];
+            selectedStudent = null;
+            renderCart();
+            clearStudent();
+            renderPOSClasses();
+            calcClear();
+            loadOverview();
+        } else {
+            showAlert('❌ ' + (r.message || 'Failed'), 'error');
+        }
+    } catch (e) {
+        showAlert('❌ ' + e.message, 'error');
+    } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+    }
+}
+
+// ============================================
+// RECEIPT
+// ============================================
+function showReceipt(sale) {
+    const itemsHtml = sale.items.map(i => `
+        <div class="row">
+            <span>${i.class_name}</span>
+            <span>${parseFloat(i.line_total).toLocaleString()}</span>
+        </div>
+    `).join('');
+
+    document.getElementById('receiptContent').innerHTML = `
+        <div class="receipt">
+            <h2>FLUX ACADEMIC</h2>
+            <div class="receipt-sub">Colombo 03 · 011-2345678</div>
+            <div class="divider"></div>
+            <div class="row"><span>Receipt:</span><span>${sale.receipt_number}</span></div>
+            <div class="row"><span>Date:</span><span>${new Date(sale.date).toLocaleString()}</span></div>
+            <div class="row"><span>Student:</span><span>${sale.student_name}</span></div>
+            <div class="divider"></div>
+            ${itemsHtml}
+            <div class="divider"></div>
+            <div class="row"><span>Subtotal:</span><span>LKR ${parseFloat(sale.subtotal).toLocaleString()}</span></div>
+            ${sale.discount > 0 ? `<div class="row"><span>Discount:</span><span>-LKR ${parseFloat(sale.discount).toLocaleString()}</span></div>` : ''}
+            <div class="row total-row"><span>TOTAL:</span><span>LKR ${parseFloat(sale.total).toLocaleString()}</span></div>
+            <div class="row"><span>Paid (${sale.payment_method}):</span><span>LKR ${parseFloat(sale.amount_paid).toLocaleString()}</span></div>
+            ${sale.change > 0 ? `<div class="row"><span>Change:</span><span>LKR ${parseFloat(sale.change).toLocaleString()}</span></div>` : ''}
+            <div class="divider"></div>
+            <div class="footer">
+                Thank you for choosing Flux Academic!<br>
+                Keep this receipt for your records.
+            </div>
+        </div>
+    `;
+    openModal('receiptModal');
+}
+
+function printReceipt() {
+    const receiptEl = document.querySelector('#receiptContent .receipt');
+    if (!receiptEl) { alert('No receipt to print'); return; }
+
+    const html = `<!DOCTYPE html>
+<html><head><title>Receipt</title>
+<style>
+body { font-family: 'Courier New', monospace; padding: 20px; }
+.receipt { max-width: 400px; margin: 0 auto; }
+h2 { text-align: center; font-size: 1.2rem; }
+.receipt-sub { text-align: center; font-size: .75rem; color: #666; margin-bottom: 1rem; }
+.divider { border-top: 1px dashed #999; margin: 10px 0; }
+.row { display: flex; justify-content: space-between; font-size: .85rem; padding: 3px 0; }
+.total-row { font-weight: 700; font-size: 1.1rem; border-top: 2px solid #000; padding-top: 8px; margin-top: 8px; }
+.footer { text-align: center; font-size: .7rem; color: #666; margin-top: 1rem; }
+</style></head>
+<body>${receiptEl.outerHTML}</body></html>`;
+
+    const w = window.open('', '_blank', 'width=500,height=700');
+    if (!w) { alert('Popup blocked'); return; }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => { w.focus(); w.print(); }, 300);
+}
+
+// ============================================
+// REGISTER STUDENT
+// ============================================
+function generateRandomCredentials() {
+    const fname = document.getElementById('regFname').value.trim().toLowerCase();
+    const lname = document.getElementById('regLname').value.trim().toLowerCase();
+    if (!fname || !lname) {
+        showAlert('Enter first and last name first', 'info', 'registerAlert');
+        return;
+    }
+    const base = (fname.charAt(0) + lname).replace(/[^a-z0-9]/g, '');
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('regUsername').value = base + rand;
+    document.getElementById('regPassword').value = 'flx' + rand;
+}
+
+async function registerStudent() {
+    const data = {
+        first_name: document.getElementById('regFname').value.trim(),
+        last_name: document.getElementById('regLname').value.trim(),
+        email: document.getElementById('regEmail').value.trim(),
+        phone: document.getElementById('regPhone').value.trim(),
+        username: document.getElementById('regUsername').value.trim(),
+        password: document.getElementById('regPassword').value,
+        program: document.getElementById('regProgram').value,
+        created_by: currentUser.id
+    };
+
+    if (!data.first_name || !data.last_name || !data.email || !data.phone || !data.username || !data.password) {
+        showAlert('Fill all required fields', 'error', 'registerAlert');
+        return;
+    }
+    if (data.password.length < 6) {
+        showAlert('Password min 6 chars', 'error', 'registerAlert');
+        return;
+    }
+
+    const btn = document.getElementById('registerBtn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Registering...';
+    btn.disabled = true;
+
+    try {
+        const r = await apiRequest('register_student', 'POST', data);
+        if (r.success) {
+            showAlert('✅ Student registered!', 'success', 'registerAlert');
+            ['regFname','regLname','regEmail','regPhone','regUsername','regPassword']
+                .forEach(id => document.getElementById(id).value = '');
+            const sR = await apiRequest('get_student_qr', 'POST', { student_id: r.data.id });
+            if (sR.success) {
+                showQRCode({
+                    ...r.data,
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    card_number: r.data.card_number,
+                    qr_token: sR.data.qr_token || r.data.qr_token
+                });
+            } else {
+                showQRCode({
+                    id: r.data.id,
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    card_number: r.data.card_number,
+                    qr_token: r.data.qr_token
+                });
+            }
+            loadOverview();
+        } else {
+            showAlert('❌ ' + r.message, 'error', 'registerAlert');
+        }
+    } catch (e) {
+        showAlert('❌ Network error', 'error', 'registerAlert');
+    } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+    }
+}
+
+// ============================================
+// QR CODE — qrcodejs API
+// ============================================
+function showQRCode(student) {
+    currentQRData = student;
+    const container = document.getElementById('qrContent');
+    const qrValue = student.qr_token || student.card_number;
+
+    if (!qrValue) {
+        container.innerHTML = '<p style="color:#e74c3c;padding:1rem;">❌ QR token missing</p>';
+        openModal('qrModal');
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="qr-card">
+            <div class="qr-header">FLUX ACADEMIC</div>
+            <div class="qr-sub">Student ID Card</div>
+            <div id="qrCanvasWrap" class="qr-canvas-wrap" style="min-height:220px;"></div>
+            <div class="qr-name">${student.first_name} ${student.last_name}</div>
+            <div class="qr-code-num">${student.card_number}</div>
+            <div class="qr-hint">Scan this QR to mark attendance</div>
+        </div>
+    `;
+
+    openModal('qrModal');
+
+    setTimeout(function() {
+        try {
+            if (typeof QRCode === 'undefined') {
+                document.getElementById('qrCanvasWrap').innerHTML =
+                    '<p style="color:#e74c3c;padding:1rem;">❌ QRCode library not loaded</p>';
+                return;
+            }
+            const wrap = document.getElementById('qrCanvasWrap');
+            wrap.innerHTML = '';
+            new QRCode(wrap, {
+                text: qrValue,
+                width: 220,
+                height: 220,
+                colorDark: '#0a1628',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            console.log('✅ QR generated for', student.first_name);
+        } catch (e) {
+            console.error('QR error:', e);
+        }
+    }, 200);
+}
+
+function printQR() {
+    if (!currentQRData) { alert('No QR data to print'); return; }
+    const canvas = document.querySelector('#qrContent canvas');
+    const img = document.querySelector('#qrContent img');
+    let qrDataUrl = '';
+    if (canvas) { try { qrDataUrl = canvas.toDataURL('image/png'); } catch (e) {} }
+    if (!qrDataUrl && img && img.src) { qrDataUrl = img.src; }
+    if (!qrDataUrl) { alert('QR not ready'); return; }
+
+    const s = currentQRData;
+    const html = `<!DOCTYPE html>
+<html><head><title>QR - ${s.first_name} ${s.last_name}</title>
+<style>
+body { font-family: Arial; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; background:#f5f5f5; }
+.card { border:3px solid #0d7c6e; border-radius:16px; padding:1.5rem; text-align:center; width:340px; background:#fff; }
+.header { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:6px; }
+.logo-icon { width:34px; height:34px; background:linear-gradient(135deg,#0d7c6e,#e8b84b); border-radius:8px; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; }
+h2 { color:#0d7c6e; margin:0; font-size:1.2rem; }
+.sub { color:#666; font-size:0.75rem; margin-bottom:1rem; }
+.qr { display:flex; justify-content:center; margin:1rem 0; }
+.qr img { width:200px; height:200px; display:block; }
+.name { font-weight:700; font-size:1.1rem; }
+.card-num { font-family:monospace; color:#0d7c6e; font-weight:700; margin-top:4px; font-size:0.9rem; }
+.hint { font-size:0.7rem; color:#888; margin-top:8px; }
+@media print { body { background:#fff; padding:0; } }
+</style></head><body>
+<div class="card">
+    <div class="header"><div class="logo-icon">Fx</div><h2>FLUX ACADEMIC</h2></div>
+    <div class="sub">Student ID Card</div>
+    <div class="qr"><img src="${qrDataUrl}" alt="QR"></div>
+    <div class="name">${s.first_name} ${s.last_name}</div>
+    <div class="card-num">${s.card_number}</div>
+    <div class="hint">Scan this QR to mark attendance</div>
+</div>
+</body></html>`;
+
+    const w = window.open('', '_blank', 'width=500,height=700');
+    if (!w) { alert('Popup blocked'); return; }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => { w.focus(); w.print(); }, 500);
+}
+
+// ============================================
+// SEARCH STUDENTS
+// ============================================
+const debouncedStudentSearch = debounce(async function() {
+    const q = document.getElementById('studentSearchInput').value.trim();
+    const container = document.getElementById('studentSearchResults');
+    if (q.length < 2 && q.length > 0) {
+        container.innerHTML = '<p style="color:var(--muted);">Type at least 2 characters...</p>';
+        return;
+    }
+    const r = await apiRequest('search_students', 'POST', { search: q });
+    if (!r.success) return;
+    if (r.data.length === 0) {
+        container.innerHTML = '<p class="empty-state">No students found</p>';
+        return;
+    }
+    container.innerHTML = r.data.map(s => `
+        <div style="background:var(--surface2);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div>
+                <div style="font-weight:700;">${s.first_name} ${s.last_name}</div>
+                <div style="font-size:.75rem;color:var(--muted);">${s.card_number || '-'} · ${s.email} · ${s.phone || '-'} · ${s.enrolled_count} classes</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-primary btn-xs" onclick="viewStudentDetails(${s.id})"><i class="ti ti-eye"></i> View</button>
+                <button class="btn btn-gold btn-xs" onclick="showStudentQR(${s.id})"><i class="ti ti-qrcode"></i> QR</button>
+            </div>
+        </div>
+    `).join('');
+}, 300);
+
+async function viewStudentDetails(id) {
+    const r = await apiRequest('get_student_details', 'POST', { student_id: id });
+    if (!r.success) return;
+    const s = r.data;
+
+    document.getElementById('studentModalContent').innerHTML = `
+        <div style="background:var(--surface2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+            <div style="font-weight:700;font-size:1.1rem;">${s.first_name} ${s.last_name}</div>
+            <div style="color:var(--muted);font-size:.85rem;margin-top:4px;">
+                📇 ${s.card_number || '-'} · 📧 ${s.email}<br>
+                📞 ${s.phone || '-'} · 🎓 ${s.program || '-'}
+            </div>
+        </div>
+
+        <h4 style="margin-bottom:.5rem;color:var(--gold);">Enrollments (${s.enrollments.length})</h4>
+        ${s.enrollments.length === 0 ? '<p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">None</p>' :
+            s.enrollments.map(e => `
+                <div style="padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:.85rem;">
+                    <div style="font-weight:600;">${e.class_name}</div>
+                    <div style="color:var(--muted);font-size:.75rem;">${e.subject} · ${e.year} · ${e.status}</div>
+                </div>
+            `).join('')
+        }
+
+        <h4 style="margin:1rem 0 .5rem;color:var(--gold);">Recent Payments (${s.payments.length})</h4>
+        ${s.payments.length === 0 ? '<p style="color:var(--muted);font-size:.85rem;">None</p>' :
+            s.payments.map(p => `
+                <div style="padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:.85rem;display:flex;justify-content:space-between;">
+                    <div>${p.class_name}</div>
+                    <div style="color:var(--gold);font-weight:700;">LKR ${parseFloat(p.amount).toLocaleString()}</div>
+                </div>
+            `).join('')
+        }
+    `;
+    openModal('studentModal');
+}
+
+async function showStudentQR(id) {
+    const r = await apiRequest('get_student_qr', 'POST', { student_id: id });
+    if (!r.success) { showAlert('Failed to load QR', 'error'); return; }
+    showQRCode(r.data);
+}
+
+// ============================================
+// 🖨️ PHYSICAL SCANNER ATTENDANCE
+// ============================================
+
+// Load classes for scanner dropdown
+async function loadClassesForScanner() {
+    const r = await apiRequest('get_all_classes');
+    if (!r.success) return;
+    const select = document.getElementById('scannerClassId');
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">-- Select class --</option>' +
+        r.data.map(c => `<option value="${c.id}">${c.name} (${c.subject} ${c.year})</option>`).join('');
+    if (currentVal) select.value = currentVal;
+}
+
+function onScannerClassChange() {
+    const classId = document.getElementById('scannerClassId').value;
+    if (classId) {
+        // Reset stats when class changes
+        sessionStats = { present: 0, late: 0, failed: 0 };
+        updateSessionStats();
+        focusScannerInput();
+    }
+}
+
+// Focus scanner input
+// Focus scanner input (smart - only when safe)
+function focusScannerInput() {
+    const input = document.getElementById('scannerInput');
+    if (!input) return;
+    
+    // Don't steal focus if user is on another input/select/button
+    const active = document.activeElement;
+    if (active && (
+        active.tagName === 'SELECT' ||
+        active.tagName === 'INPUT' ||
+        active.tagName === 'TEXTAREA' ||
+        active.tagName === 'BUTTON' ||
+        active.closest('button') ||
+        active.closest('.modal-backdrop') ||
+        active.closest('.form-group')
+    )) {
+        return; // Don't steal focus
+    }
+    
+    input.focus();
+}
+
+// Scanner input initialization
+function initPhysicalScanner() {
+    const input = document.getElementById('scannerInput');
+    if (!input) return;
+
+    // Focus on load
+    setTimeout(focusScannerInput, 500);
+
+    // Handle scanner input (Enter key = end of scan)
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const value = input.value.trim();
+            if (value) {
+                processScannerInput(value);
+                input.value = '';
+            }
+            // Re-focus for next scan
+            setTimeout(focusScannerInput, 100);
+        }
+    });
+
+    // Prevent accidental form submission
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') e.preventDefault();
+    });
+
+    // Auto-focus if input loses focus (keeps scanner ready)
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (document.getElementById('panel-scan').classList.contains('active')) {
+                focusScannerInput();
+            }
+        }, 300);
+    });
+
+    // Click to focus
+    input.addEventListener('click', function() {
+        input.select();
+    });
+
+    console.log('✅ Physical scanner input initialized');
+}
+
+// Process scanned QR code
+async function processScannerInput(qrValue) {
+    const classId = document.getElementById('scannerClassId').value;
+    const resultEl = document.getElementById('scannerResult');
+    const scannerIcon = document.getElementById('scannerIcon');
+
+    // Validate class
+    if (!classId) {
+        resultEl.innerHTML = `
+            <div class="scan-result-card error">
+                <div class="result-icon">⚠️</div>
+                <div class="result-body">
+                    <div class="result-name">No Class Selected</div>
+                    <div class="result-meta">Please select a class first before scanning</div>
+                </div>
+            </div>
+        `;
+        setTimeout(() => { resultEl.innerHTML = ''; }, 3000);
+        return;
+    }
+
+    // Prevent duplicate rapid scans
+    const now = Date.now();
+    if (qrValue === lastScanValue && (now - lastScanTime) < 2000) {
+        console.log('⏳ Duplicate scan ignored');
+        return;
+    }
+    lastScanValue = qrValue;
+    lastScanTime = now;
+
+    // Animate scanner icon
+    scannerIcon.classList.add('scanning');
+
+    try {
+        const r = await apiRequest('scan_qr', 'POST', {
+            qr_token: qrValue,
+            class_id: classId,
+            marked_by: currentUser.id
+        });
+
+        scannerIcon.classList.remove('scanning');
+
+        if (r.success) {
+            const d = r.data;
+
+            // Update stats
+            if (d.status === 'present') sessionStats.present++;
+            else if (d.status === 'late') sessionStats.late++;
+            updateSessionStats();
+
+            // Show success
+            resultEl.innerHTML = `
+                <div class="scan-result-card success">
+                    <div class="result-icon">✅</div>
+                    <div class="result-body">
+                        <div class="result-name">${d.student_name}</div>
+                        <div class="result-meta">
+                            <strong>Card:</strong> ${d.card_number}<br>
+                            <strong>Status:</strong> <span style="color:var(--success);font-weight:700;">${d.status.toUpperCase()}</span> at ${d.time}<br>
+                            <strong>Class:</strong> ${d.class_name}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add to recent scans
+            addRecentScan({
+                name: d.student_name,
+                card: d.card_number,
+                status: d.status,
+                time: d.time,
+                success: true
+            });
+
+            // Play beep
+            playBeep(800, 'sine');
+
+            // Vibrate
+            if (navigator.vibrate) navigator.vibrate(100);
+
+        } else {
+            // Update failed stats
+            sessionStats.failed++;
+            updateSessionStats();
+
+            // Show error
+            resultEl.innerHTML = `
+                <div class="scan-result-card error">
+                    <div class="result-icon">❌</div>
+                    <div class="result-body">
+                        <div class="result-name">Scan Failed</div>
+                        <div class="result-meta">${r.message || 'Unknown error'}</div>
+                    </div>
+                </div>
+            `;
+
+            addRecentScan({
+                name: r.data?.student_name || qrValue.substring(0, 20),
+                card: '-',
+                status: 'error',
+                time: new Date().toLocaleTimeString(),
+                success: false,
+                error: r.message
+            });
+
+            // Error beep
+            playBeep(300, 'square');
+        }
+    } catch (e) {
+        scannerIcon.classList.remove('scanning');
+        console.error('Scanner error:', e);
+        resultEl.innerHTML = `
+            <div class="scan-result-card error">
+                <div class="result-icon">⚠️</div>
+                <div class="result-body">
+                    <div class="result-name">Network Error</div>
+                    <div class="result-meta">${e.message}</div>
+                </div>
+            </div>
+        `;
+        sessionStats.failed++;
+        updateSessionStats();
+        playBeep(300, 'square');
+    }
+
+    // Clear result after 3 seconds
+    setTimeout(() => {
+        resultEl.innerHTML = '';
+    }, 3000);
+}
+
+// Add scan to recent list
+function addRecentScan(scan) {
+    recentScans.unshift(scan);
+    if (recentScans.length > MAX_RECENT_SCANS) {
+        recentScans.pop();
+    }
+    renderRecentScans();
+}
+
+function renderRecentScans() {
+    const container = document.getElementById('recentScans');
+    if (!container) return;
+
+    if (recentScans.length === 0) {
+        container.innerHTML = `
+            <p style="color:var(--muted);font-size:.85rem;text-align:center;padding:1.5rem;">
+                <i class="ti ti-scan" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                No scans yet this session
+            </p>
+        `;
+        return;
+    }
+
+    container.innerHTML = recentScans.map(s => `
+        <div class="recent-scan-item ${s.success ? '' : 'error'}">
+            <div class="scan-info">
+                <div class="scan-name">${s.name}</div>
+                <div class="scan-time">
+                    ${s.card !== '-' ? s.card + ' · ' : ''}${s.time}
+                </div>
+                ${s.error ? `<div style="font-size:.7rem;color:var(--danger);margin-top:2px;">${s.error}</div>` : ''}
+            </div>
+            <span class="scan-badge ${s.success ? s.status : 'error'}">
+                ${s.success ? s.status.toUpperCase() : 'FAILED'}
+            </span>
+        </div>
+    `).join('');
+}
+
+function clearRecentScans() {
+    if (!confirm('Clear recent scans list?')) return;
+    recentScans = [];
+    sessionStats = { present: 0, late: 0, failed: 0 };
+    updateSessionStats();
+    renderRecentScans();
+}
+
+function updateSessionStats() {
+    const statsEl = document.getElementById('scannerStats');
+    if (!statsEl) return;
+    const total = sessionStats.present + sessionStats.late + sessionStats.failed;
+    if (total === 0) {
+        statsEl.style.display = 'none';
+        return;
+    }
+    statsEl.style.display = 'block';
+    document.getElementById('sessionPresent').textContent = sessionStats.present;
+    document.getElementById('sessionLate').textContent = sessionStats.late;
+    document.getElementById('sessionFailed').textContent = sessionStats.failed;
+}
+
+// Beep sound
+function playBeep(frequency = 800, type = 'sine') {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        oscillator.frequency.value = frequency;
+        oscillator.type = type;
+
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + 0.15);
+    } catch (e) {}
+}
+
+// ============================================
+// TODAY ATTENDANCE
+// ============================================
+async function loadTodayAttendance() {
+    const r = await apiRequest('get_today_attendance');
+    const tbody = document.getElementById('todayAttendanceList');
+    if (!r.success || !r.data || r.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No attendance today</td></tr>';
+        return;
+    }
+    tbody.innerHTML = r.data.map(a => {
+        const method = a.marked_by_role === 'reception_manual' ? '✍️ Manual' :
+                       a.marked_by_role === 'reception' ? '📡 Scanner' : '📱 QR';
+        return `
+            <tr>
+                <td>${new Date(a.scan_time).toLocaleTimeString()}</td>
+                <td><strong>${a.student_name}</strong></td>
+                <td><span style="font-family:monospace;color:var(--accent-light);">${a.card_number || '-'}</span></td>
+                <td>${a.class_name}</td>
+                <td><span style="color:var(--success);font-weight:700;">${a.status.toUpperCase()}</span></td>
+                <td style="font-size:0.8rem;color:var(--muted);">${method}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ============================================
+// SALES HISTORY
+// ============================================
+async function loadRecentSales() {
+    const tbody = document.getElementById('salesHistoryList');
+    const r = await apiRequest('pos_recent_sales');
+    if (!r.success || !r.data) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Failed to load</td></tr>';
+        return;
+    }
+    if (r.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No sales yet</td></tr>';
+        return;
+    }
+    tbody.innerHTML = r.data.map(s => `
+        <tr>
+            <td><span style="font-family:monospace;color:var(--accent-light);">${s.receipt_number}</span></td>
+            <td>${new Date(s.created_at).toLocaleTimeString()}</td>
+            <td>${s.student_name}</td>
+            <td>${s.item_count}</td>
+            <td style="color:var(--gold);font-weight:700;">LKR ${parseFloat(s.total).toLocaleString()}</td>
+            <td>${(s.payment_method || '').toUpperCase()}</td>
+            <td>
+                <button class="btn btn-primary btn-xs" onclick="viewSaleReceipt(${s.id})"><i class="ti ti-receipt"></i> Receipt</button>
+                <button class="btn btn-danger btn-xs" onclick="voidSale(${s.id})"><i class="ti ti-trash"></i> Void</button>
+            </td>
+        </tr>
+    `).join('');
+
+    const d = document.getElementById('salesDateFilter').value || new Date().toISOString().split('T')[0];
+    const sumR = await apiRequest('pos_daily_summary', 'POST', { date: d });
+    if (sumR.success && sumR.data) {
+        const s = sumR.data;
+        document.getElementById('salesSummary').innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+                <div style="background:var(--surface2);padding:12px;border-radius:10px;">
+                    <div style="font-size:.75rem;color:var(--muted);">Total Sales</div>
+                    <div style="font-size:1.3rem;font-weight:700;color:var(--gold);">${s.total_sales}</div>
+                </div>
+                <div style="background:var(--surface2);padding:12px;border-radius:10px;">
+                    <div style="font-size:.75rem;color:var(--muted);">Gross</div>
+                    <div style="font-size:1.3rem;font-weight:700;color:var(--success);">LKR ${parseFloat(s.gross_total).toLocaleString()}</div>
+                </div>
+                <div style="background:var(--surface2);padding:12px;border-radius:10px;">
+                    <div style="font-size:.75rem;color:var(--muted);">Cash</div>
+                    <div style="font-size:1.3rem;font-weight:700;">LKR ${parseFloat(s.cash_total).toLocaleString()}</div>
+                </div>
+                <div style="background:var(--surface2);padding:12px;border-radius:10px;">
+                    <div style="font-size:.75rem;color:var(--muted);">Card</div>
+                    <div style="font-size:1.3rem;font-weight:700;">LKR ${parseFloat(s.card_total).toLocaleString()}</div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+async function viewSaleReceipt(saleId) {
+    const r = await apiRequest('pos_get_sale', 'POST', { sale_id: saleId });
+    if (!r.success) { showAlert('Failed to load receipt', 'error'); return; }
+    const s = r.data;
+    showReceipt({
+        receipt_number: s.receipt_number,
+        date: s.created_at,
+        student_name: s.student_name,
+        items: s.items,
+        subtotal: s.subtotal,
+        discount: s.discount,
+        total: s.total,
+        payment_method: s.payment_method,
+        amount_paid: s.amount_paid,
+        change: s.change_given
+    });
+}
+
+async function voidSale(saleId) {
+    if (!confirm('Void this sale? This will reverse enrollments.')) return;
+    const r = await apiRequest('pos_void_sale', 'POST', { sale_id: saleId });
+    if (r.success) {
+        showAlert('✅ Sale voided', 'success');
+        loadRecentSales();
+        loadOverview();
+    } else {
+        showAlert('❌ ' + r.message, 'error');
+    }
+}
+
+// ============================================
+// INQUIRIES
+// ============================================
+async function loadInquiries() {
+    const r = await apiRequest('list_inquiries');
+    const c = document.getElementById('inquiriesList');
+    if (!r.success || !r.data || r.data.length === 0) {
+        c.innerHTML = '<p class="empty-state">No inquiries yet</p>';
+        return;
+    }
+    const statusColors = {
+        new: 'info', contacted: 'warning', converted: 'success', lost: 'danger'
+    };
+    c.innerHTML = r.data.map(i => `
+        <div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap;">
+                <div>
+                    <div style="font-weight:700;">${i.full_name}</div>
+                    <div style="font-size:.8rem;color:var(--muted);">📞 ${i.phone}${i.email ? ' · 📧 ' + i.email : ''}</div>
+                    ${i.subject_interest ? `<div style="font-size:.8rem;color:var(--accent-light);">📚 ${i.subject_interest}</div>` : ''}
+                    ${i.message ? `<div style="font-size:.8rem;color:var(--muted);margin-top:4px;">"${i.message}"</div>` : ''}
+                </div>
+                <div style="text-align:right;">
+                    <span class="alert alert-${statusColors[i.status]} show" style="font-size:.7rem;padding:4px 10px;margin-bottom:6px;">
+                        ${i.status.toUpperCase()}
+                    </span>
+                    <div style="font-size:.7rem;color:var(--muted);">${new Date(i.created_at).toLocaleDateString()}</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+                <select onchange="updateInquiryStatus(${i.id}, this.value)" style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.75rem;">
+                    <option value="">Change status...</option>
+                    <option value="new">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="converted">Converted</option>
+                    <option value="lost">Lost</option>
+                </select>
+                <button class="btn btn-danger btn-xs" onclick="deleteInquiry(${i.id})"><i class="ti ti-trash"></i> Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openInquiryModal() {
+    document.getElementById('inquiryId').value = '';
+    document.getElementById('inquiryName').value = '';
+    document.getElementById('inquiryPhone').value = '';
+    document.getElementById('inquiryEmail').value = '';
+    document.getElementById('inquirySubject').value = '';
+    document.getElementById('inquiryMessage').value = '';
+    openModal('inquiryModal');
+}
+
+async function saveInquiry() {
+    const data = {
+        full_name: document.getElementById('inquiryName').value.trim(),
+        phone: document.getElementById('inquiryPhone').value.trim(),
+        email: document.getElementById('inquiryEmail').value.trim(),
+        subject_interest: document.getElementById('inquirySubject').value,
+        message: document.getElementById('inquiryMessage').value.trim(),
+        handled_by: currentUser.id
+    };
+    if (!data.full_name || !data.phone) {
+        showAlert('Name and phone required', 'error');
+        return;
+    }
+    const r = await apiRequest('add_inquiry', 'POST', data);
+    if (r.success) {
+        showAlert('✅ Saved', 'success');
+        closeModal('inquiryModal');
+        loadInquiries();
+        loadOverview();
+    } else {
+        showAlert('❌ ' + r.message, 'error');
+    }
+}
+
+async function updateInquiryStatus(id, status) {
+    if (!status) return;
+    const r = await apiRequest('update_inquiry', 'POST', { id, status, notes: '' });
+    if (r.success) { loadInquiries(); loadOverview(); }
+}
+
+async function deleteInquiry(id) {
+    if (!confirm('Delete this inquiry?')) return;
+    const r = await apiRequest('delete_inquiry', 'POST', { id });
+    if (r.success) loadInquiries();
+}
+
+// ============================================
+// ALERTS
+// ============================================
+function showAlert(msg, type = 'info', containerId = 'alertMessage') {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'alert alert-' + type + ' show';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+// ============================================
+// INIT
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    if (checkAuth()) {
+        document.getElementById('salesDateFilter').value = new Date().toISOString().split('T')[0];
+
+        document.addEventListener('click', function(e) {
+            const results = document.getElementById('posSearchResults');
+            if (results && !e.target.closest('.pos-search')) {
+                results.classList.remove('show');
+            }
+        });
+
+        // Initialize physical scanner
+        initPhysicalScanner();
+
+        // Log QR library status
+        setTimeout(() => {
+            if (typeof QRCode === 'undefined') {
+                console.error('❌ QRCode library NOT loaded');
+            } else {
+                console.log('✅ QRCode library loaded successfully');
+            }
+        }, 1000);
+    }
+});
+
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+});
+</script>
+</body>
+</html>

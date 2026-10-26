@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Dashboard | Flux Academic</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #0a1628;
+  --secondary: #112244;
+  --accent: #0d7c6e;
+  --accent-light: #14a898;
+  --gold: #e8b84b;
+  --gold-light: #f5d07a;
+  --text: #e8edf5;
+  --muted: #8fa3be;
+  --surface: #16243c;
+  --surface2: #1d2f4a;
+  --success: #2ecc71;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --info: #3498db;
+  --border: rgba(255,255,255,0.06);
+}
+body { font-family: 'Inter', sans-serif; background: var(--primary); color: var(--text); min-height: 100vh; }
+
+/* ============ SIDEBAR ============ */
+.sidebar {
+  position: fixed; left: 0; top: 0; height: 100vh; width: 270px;
+  background: var(--secondary); border-right: 1px solid var(--border);
+  padding: 1.5rem; overflow-y: auto; z-index: 1000;
+  transition: transform 0.3s ease;
+}
+.sidebar .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+.sidebar .logo .icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #fff; font-size: 1.1rem;
+}
+.sidebar .logo h1 { font-size: 1.15rem; font-weight: 700; }
+.sidebar .logo h1 span { color: var(--gold); }
+
+.teacher-profile-card {
+  background: linear-gradient(135deg, rgba(13,124,110,0.2), rgba(232,184,75,0.1));
+  border: 1px solid rgba(13,124,110,0.3);
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.teacher-profile-card .avatar {
+  width: 50px; height: 50px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.3rem; color: #fff;
+  flex-shrink: 0;
+}
+.teacher-profile-card .info { flex: 1; min-width: 0; }
+.teacher-profile-card .info .name {
+  font-weight: 700; font-size: 0.95rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.teacher-profile-card .info .role {
+  font-size: 0.7rem; color: var(--gold); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.teacher-profile-card .info .subject {
+  font-size: 0.75rem; color: var(--muted); margin-top: 2px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: 12px;
+  color: var(--muted); cursor: pointer;
+  transition: all 0.2s; margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+.nav-item:hover { background: var(--surface); color: var(--text); }
+.nav-item.active { background: var(--accent); color: #fff; }
+.nav-item i { font-size: 1.15rem; }
+.nav-item .badge {
+  margin-left: auto; background: var(--danger); color: #fff;
+  font-size: 0.65rem; padding: 2px 8px; border-radius: 20px;
+}
+.nav-item.logout {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  color: var(--danger);
+}
+.nav-item.logout:hover { background: rgba(231,76,60,0.1); color: var(--danger); }
+
+/* ============ MAIN ============ */
+.main { margin-left: 270px; padding: 2rem; min-height: 100vh; }
+
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+}
+.header h2 { font-weight: 700; font-size: 1.5rem; }
+.header .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+.header .header-greeting {
+  color: var(--muted); font-size: 0.85rem; margin-top: 4px;
+}
+.header .header-greeting strong { color: var(--gold); }
+
+/* ============ BUTTONS ============ */
+.btn {
+  padding: 10px 20px; border: none; border-radius: 12px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.85rem;
+}
+.btn:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-gold { background: var(--gold); color: var(--primary); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-info { background: var(--info); color: #fff; }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.btn-sm { padding: 6px 14px; font-size: 0.75rem; }
+.btn-xs { padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; }
+
+/* ============ STATS ============ */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem; margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--surface); padding: 1.25rem; border-radius: 16px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem;
+  transition: all 0.2s;
+}
+.stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.stat-card .icon-wrap {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  background: rgba(13,124,110,0.15); color: var(--accent-light);
+  flex-shrink: 0;
+}
+.stat-card .icon-wrap.gold { background: rgba(232,184,75,0.15); color: var(--gold); }
+.stat-card .icon-wrap.blue { background: rgba(52,152,219,0.15); color: var(--info); }
+.stat-card .icon-wrap.green { background: rgba(46,204,113,0.15); color: var(--success); }
+.stat-card .number { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
+.stat-card .label { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+/* ============ PANELS ============ */
+.panel { display: none; animation: fadeIn 0.3s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--surface); border-radius: 16px; padding: 1.5rem;
+  border: 1px solid var(--border); margin-bottom: 1.5rem;
+}
+.card h3 {
+  margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+  font-size: 1.1rem;
+}
+.card h3 i { color: var(--gold); }
+.card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+}
+.card-header h3 { margin-bottom: 0; }
+
+/* ============ CLASS CARDS ============ */
+.classes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.class-card {
+  background: var(--surface2);
+  border-radius: 14px;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  transition: all 0.2s;
+}
+.class-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.class-card .class-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(232,184,75,0.2);
+  color: var(--gold);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.class-card h4 {
+  margin: 8px 0 6px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.class-card .meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.class-card .meta .row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.class-card .stats-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.class-card .stats-row .stat {
+  flex: 1;
+  text-align: center;
+}
+.class-card .stats-row .stat .val {
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 1.1rem;
+}
+.class-card .stats-row .stat .lbl {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.class-card .actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ============ STUDENT LIST ============ */
+.student-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 10px;
+}
+.student-item:last-child { border-bottom: none; }
+.student-item .avatar-sm {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.student-item .student-info { flex: 1; min-width: 150px; }
+
+/* ============ MATERIALS ============ */
+.material-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px; background: var(--surface2);
+  border-radius: 12px; margin-bottom: 10px;
+  border-left: 4px solid var(--accent);
+  flex-wrap: wrap; gap: 10px;
+}
+.material-item:last-child { margin-bottom: 0; }
+.material-item .icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(13,124,110,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.material-item .info { flex: 1; min-width: 150px; }
+.material-item .info .title { font-weight: 600; margin-bottom: 3px; }
+.material-item .info .meta { font-size: 0.75rem; color: var(--muted); }
+
+/* ============ MEETINGS ============ */
+.meeting-card {
+  background: var(--surface2); padding: 1rem; border-radius: 12px;
+  margin-bottom: 1rem; border-left: 4px solid var(--accent);
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 12px;
+}
+.meeting-card .meeting-info { flex: 1; min-width: 200px; }
+.meeting-card .meeting-info strong { display: block; margin-bottom: 4px; }
+.meeting-card .meeting-info .meta { font-size: 0.8rem; color: var(--muted); margin-top: 3px; }
+.meeting-card .meeting-url { color: var(--accent-light); font-size: 0.8rem; word-break: break-all; }
+
+/* ============ MODALS ============ */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  z-index: 2000; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 20px; padding: 1.75rem;
+  max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto;
+  border: 1px solid var(--border);
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.25rem; padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { color: var(--gold-light); font-size: 1.15rem; }
+.modal .close {
+  background: none; border: none; color: var(--muted);
+  font-size: 1.5rem; cursor: pointer; line-height: 1;
+}
+.modal .close:hover { color: var(--danger); }
+
+/* ============ FORMS ============ */
+.form-group { margin-bottom: 1rem; }
+.form-group label {
+  display: block; font-size: 0.8rem; font-weight: 600;
+  color: var(--muted); margin-bottom: 6px;
+}
+.form-group label .req { color: var(--danger); }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%; padding: 11px 14px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.9rem;
+  transition: border 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+.form-group textarea { min-height: 80px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-hint { font-size: 0.7rem; color: var(--muted); margin-top: 4px; display: block; }
+
+/* ============ FILE UPLOAD ============ */
+.file-upload {
+  border: 2px dashed rgba(13,124,110,0.4);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(13,124,110,0.04);
+}
+.file-upload:hover, .file-upload.dragover {
+  border-color: var(--accent);
+  background: rgba(13,124,110,0.1);
+}
+.file-upload i {
+  font-size: 2rem; color: var(--accent-light);
+  margin-bottom: 8px; display: block;
+}
+.file-upload .upload-text { font-size: 0.85rem; font-weight: 600; }
+.file-upload .upload-hint { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+.file-preview {
+  display: none;
+  margin-top: 10px; padding: 10px 14px;
+  background: rgba(46,204,113,0.1);
+  border: 1px solid var(--success);
+  border-radius: 10px;
+  font-size: 0.8rem; color: var(--success);
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.file-preview.show { display: flex; }
+
+/* ============ ALERTS ============ */
+.alert {
+  padding: 12px 16px; border-radius: 10px; margin-bottom: 1rem;
+  display: none; font-size: 0.85rem;
+  align-items: center; gap: 10px;
+}
+.alert.show { display: flex; }
+.alert-success { background: rgba(46,204,113,0.15); border: 1px solid var(--success); color: var(--success); }
+.alert-error { background: rgba(231,76,60,0.15); border: 1px solid var(--danger); color: var(--danger); }
+.alert-info { background: rgba(52,152,219,0.15); border: 1px solid var(--info); color: var(--info); }
+.alert-warning { background: rgba(243,156,18,0.15); border: 1px solid var(--warning); color: var(--warning); }
+
+/* ============ SEARCH BAR ============ */
+.search-bar {
+  position: relative; margin-bottom: 1rem;
+}
+.search-bar input {
+  width: 100%; padding: 11px 14px 11px 40px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 0.9rem;
+}
+.search-bar input:focus { outline: none; border-color: var(--accent); }
+.search-bar i {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted); font-size: 1rem; pointer-events: none;
+}
+
+/* ============ EMPTY STATE ============ */
+.empty-state {
+  text-align: center; padding: 2.5rem 1rem;
+  color: var(--muted); font-size: 0.9rem;
+}
+.empty-state i {
+  font-size: 3rem; display: block;
+  margin-bottom: 0.75rem; opacity: 0.4;
+  color: var(--accent-light);
+}
+.empty-state strong { display: block; color: var(--text); margin-bottom: 4px; font-size: 1rem; }
+
+/* ============ SPINNER ============ */
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%; border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+  margin-right: 6px; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============ MOBILE ============ */
+.mobile-toggle {
+  display: none; position: fixed; top: 1rem; left: 1rem;
+  z-index: 1001; background: var(--surface);
+  border: 1px solid var(--border); color: var(--text);
+  padding: 8px 12px; border-radius: 8px; cursor: pointer;
+}
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); width: 280px; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 1rem; padding-top: 4rem; }
+  .mobile-toggle { display: flex; }
+  .form-row { grid-template-columns: 1fr; }
+  .classes-grid { grid-template-columns: 1fr; }
+  .header h2 { font-size: 1.2rem; }
+}
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--primary); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- ============ SIDEBAR ============ -->
+<div class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="icon">Fx</div>
+    <h1>Flux <span>Academic</span></h1>
+  </div>
+
+  <!-- Teacher Profile Card -->
+  <div class="teacher-profile-card">
+    <div class="avatar" id="teacherAvatar">T</div>
+    <div class="info">
+      <div class="name" id="teacherName">Teacher Name</div>
+      <div class="role">👨‍🏫 Teacher</div>
+      <div class="subject" id="teacherSubject">Subject</div>
+    </div>
+  </div>
+
+  <div class="nav-item active" onclick="showPanel('overview')" id="nav-overview">
+    <i class="ti ti-dashboard"></i> Overview
+  </div>
+  <div class="nav-item" onclick="showPanel('classes')" id="nav-classes">
+    <i class="ti ti-book"></i> My Classes
+    <span class="badge" id="classCount" style="display:none;">0</span>
+  </div>
+  <div class="nav-item" onclick="showPanel('students')" id="nav-students">
+    <i class="ti ti-users"></i> Students
+  </div>
+  <div class="nav-item" onclick="showPanel('materials')" id="nav-materials">
+    <i class="ti ti-files"></i> Materials
+  </div>
+  <div class="nav-item" onclick="showPanel('meetings')" id="nav-meetings">
+    <i class="ti ti-video"></i> Zoom Meetings
+  </div>
+  <div class="nav-item logout" onclick="logout()">
+    <i class="ti ti-logout"></i> Logout
+  </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<div class="main">
+  <div class="header">
+    <div>
+      <h2 id="panelTitle">Overview</h2>
+      <div class="subtitle" id="panelSubtitle">Welcome back to your dashboard</div>
+      <div class="header-greeting" id="greeting">Hello, <strong>Teacher</strong>! 👋</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-gold" onclick="openModal('meetingModal')">
+        <i class="ti ti-video-plus"></i> New Meeting
+      </button>
+      <button class="btn btn-primary" onclick="openModal('materialModal')">
+        <i class="ti ti-cloud-upload"></i> Upload Material
+      </button>
+    </div>
+  </div>
+
+  <div id="alertMessage" class="alert"></div>
+
+  <!-- OVERVIEW -->
+  <div class="panel active" id="panel-overview">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon-wrap"><i class="ti ti-book"></i></div>
+        <div>
+          <div class="number" id="statClasses">0</div>
+          <div class="label">My Classes</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap green"><i class="ti ti-users"></i></div>
+        <div>
+          <div class="number" id="statStudents">0</div>
+          <div class="label">Total Students</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap gold"><i class="ti ti-files"></i></div>
+        <div>
+          <div class="number" id="statMaterials">0</div>
+          <div class="label">Materials</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap blue"><i class="ti ti-video"></i></div>
+        <div>
+          <div class="number" id="statMeetings">0</div>
+          <div class="label">Upcoming Meetings</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="ti ti-calendar-event"></i> Upcoming Meetings</h3>
+        <button class="btn btn-ghost btn-sm" onclick="showPanel('meetings')">View All →</button>
+      </div>
+      <div id="upcomingMeetings"><p style="color:var(--muted);">Loading...</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="ti ti-book"></i> My Classes</h3>
+        <button class="btn btn-ghost btn-sm" onclick="showPanel('classes')">View All →</button>
+      </div>
+      <div id="overviewClasses"><p style="color:var(--muted);">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- CLASSES -->
+  <div class="panel" id="panel-classes">
+    <div class="card-header">
+      <h3><i class="ti ti-book"></i> My Classes</h3>
+      <button class="btn btn-primary btn-sm" onclick="openModal('classModal')">
+        <i class="ti ti-plus"></i> Add Class
+      </button>
+    </div>
+    <div id="teacherClasses" class="classes-grid">
+      <p style="color:var(--muted);">Loading...</p>
+    </div>
+  </div>
+
+  <!-- STUDENTS -->
+  <div class="panel" id="panel-students">
+    <div class="card-header">
+      <h3><i class="ti ti-users"></i> My Students</h3>
+    </div>
+    <div class="card">
+      <div class="form-row" style="margin-bottom:1rem;">
+        <div class="form-group" style="margin:0;">
+          <label>Filter by Class</label>
+          <select id="studentFilter" onchange="loadStudents()">
+            <option value="">All Classes</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Search</label>
+          <div class="search-bar" style="margin:0;">
+            <i class="ti ti-search"></i>
+            <input type="text" id="studentSearch" placeholder="Search by name or email..." oninput="debouncedLoadStudents()">
+          </div>
+        </div>
+      </div>
+      <div id="studentsList"><p style="color:var(--muted);">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- MATERIALS -->
+  <div class="panel" id="panel-materials">
+    <div class="card-header">
+      <h3><i class="ti ti-files"></i> Class Materials</h3>
+      <button class="btn btn-primary btn-sm" onclick="openModal('materialModal')">
+        <i class="ti ti-cloud-upload"></i> Upload Material
+      </button>
+    </div>
+    <div class="card">
+      <div class="form-row" style="margin-bottom:1rem;">
+        <div class="form-group" style="margin:0;">
+          <label>Filter by Class</label>
+          <select id="materialFilter" onchange="loadMaterials()">
+            <option value="">All Classes</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Search</label>
+          <div class="search-bar" style="margin:0;">
+            <i class="ti ti-search"></i>
+            <input type="text" id="materialSearch" placeholder="Search materials..." oninput="debouncedLoadMaterials()">
+          </div>
+        </div>
+      </div>
+      <div id="materialsList"><p style="color:var(--muted);">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- MEETINGS -->
+  <div class="panel" id="panel-meetings">
+    <div class="card-header">
+      <h3><i class="ti ti-video"></i> Zoom Meetings</h3>
+      <button class="btn btn-primary btn-sm" onclick="openModal('meetingModal')">
+        <i class="ti ti-plus"></i> Schedule Meeting
+      </button>
+    </div>
+    <div class="card">
+      <div class="form-row" style="margin-bottom:1rem;">
+        <div class="form-group" style="margin:0;">
+          <label>Filter by Class</label>
+          <select id="meetingFilter" onchange="loadMeetings()">
+            <option value="">All Classes</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Filter by Status</label>
+          <select id="meetingStatusFilter" onchange="loadMeetings()">
+            <option value="">All Statuses</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="live">Live</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+      <div id="meetingsList"><p style="color:var(--muted);">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADD CLASS MODAL ============ -->
+<div class="modal-backdrop" id="classModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="ti ti-book"></i> Add New Class</h3>
+      <button class="close" onclick="closeModal('classModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Class Name <span class="req">*</span></label>
+      <input type="text" id="addClassName" placeholder="e.g., Biology 2026 A/L">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Subject <span class="req">*</span></label>
+        <select id="addClassSubject">
+          <option value="Biology">Biology</option>
+          <option value="Combined Maths">Combined Maths</option>
+          <option value="Physics">Physics</option>
+          <option value="Chemistry">Chemistry</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Year <span class="req">*</span></label>
+        <select id="addClassYear">
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Schedule</label>
+      <input type="text" id="addClassSchedule" placeholder="e.g., Saturdays 8:00-11:00 AM">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Price (LKR)</label>
+        <input type="number" id="addClassPrice" value="25000">
+      </div>
+      <div class="form-group">
+        <label>Capacity</label>
+        <input type="number" id="addClassCapacity" value="50">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="addClass()" style="width:100%;justify-content:center;">
+      <i class="ti ti-check"></i> Add Class
+    </button>
+  </div>
+</div>
+
+<!-- ============ UPLOAD MATERIAL MODAL ============ -->
+<div class="modal-backdrop" id="materialModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="ti ti-cloud-upload"></i> Upload Class Material</h3>
+      <button class="close" onclick="closeModal('materialModal')">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label>Select Class <span class="req">*</span></label>
+      <select id="materialClass">
+        <option value="">-- Select a class --</option>
+      </select>
+      <span class="form-hint">Choose which class this material belongs to</span>
+    </div>
+
+    <div class="form-group">
+      <label>Title <span class="req">*</span></label>
+      <input type="text" id="materialTitle" placeholder="e.g., Biology Unit 1 - Cell Structure Notes">
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="materialDesc" placeholder="Brief description of the material (optional)"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>File <span class="req">*</span></label>
+      <div class="file-upload" id="materialUploadZone" onclick="document.getElementById('materialFile').click()">
+        <i class="ti ti-cloud-upload"></i>
+        <div class="upload-text">Click or drag to select file</div>
+        <div class="upload-hint">PDF, DOC, DOCX, PPT, PPTX, MP4, JPG, PNG · Max 20MB</div>
+        <input type="file" id="materialFile" style="display:none;" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.jpg,.jpeg,.png,.webp" onchange="handleMaterialFile(event)">
+      </div>
+      <div class="file-preview" id="materialFilePreview">
+        <span>✅ <strong id="materialFileName"></strong> (<span id="materialFileSize"></span>)</span>
+        <button class="btn btn-xs btn-danger" onclick="clearMaterialFile()" style="padding:4px 10px;">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="uploadMaterialBtn" onclick="uploadMaterial()" style="width:100%;justify-content:center;">
+      <i class="ti ti-upload"></i> Upload Material
+    </button>
+  </div>
+</div>
+
+<!-- ============ SCHEDULE MEETING MODAL ============ -->
+<div class="modal-backdrop" id="meetingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="ti ti-video"></i> Schedule Zoom Meeting</h3>
+      <button class="close" onclick="closeModal('meetingModal')">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label>Select Class <span class="req">*</span></label>
+      <select id="meetingClass">
+        <option value="">-- Select a class --</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Meeting Title <span class="req">*</span></label>
+      <input type="text" id="meetingTitle" placeholder="e.g., Biology Revision Session">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date <span class="req">*</span></label>
+        <input type="date" id="meetingDate">
+      </div>
+      <div class="form-group">
+        <label>Time <span class="req">*</span></label>
+        <input type="time" id="meetingTime">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Duration (minutes)</label>
+      <input type="number" id="meetingDuration" value="60" min="15" max="300">
+    </div>
+
+    <div class="form-group">
+      <label>Zoom Meeting URL <span class="req">*</span></label>
+      <input type="url" id="meetingUrl" placeholder="https://zoom.us/j/123456789">
+    </div>
+
+    <div class="form-group">
+      <label>Password (optional)</label>
+      <input type="text" id="meetingPassword" placeholder="Meeting passcode">
+    </div>
+
+    <button class="btn btn-primary" onclick="scheduleMeeting()" style="width:100%;justify-content:center;">
+      <i class="ti ti-calendar-plus"></i> Schedule Meeting
+    </button>
+  </div>
+</div>
+
+<script>
+// ============================================
+// GLOBAL STATE
+// ============================================
+let currentUser = null;
+let teacherClasses = [];
+let allStudents = [];
+let allMaterials = [];
+let allMeetings = [];
+let selectedMaterialFile = null;
+let materialFilterClassId = '';
+let meetingFilterClassId = '';
+
+// ============================================
+// API HELPER
+// ============================================
+async function apiRequest(action, method = 'POST', data = {}) {
+    const formData = new URLSearchParams();
+    formData.append('action', action);
+    if (currentUser && currentUser.id && !data.teacher_id) {
+        formData.append('teacher_id', currentUser.id);
+    }
+    for (let key in data) formData.append(key, data[key]);
+
+    try {
+        const response = await fetch('backend_teacher.php', {
+            method: method,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        return { success: false, message: 'Connection error' };
+    }
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+function showPanel(panel) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + panel).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('nav-' + panel).classList.add('active');
+
+    const titles = {
+        'overview': ['Overview', 'Your teaching summary at a glance'],
+        'classes': ['My Classes', 'Manage your classes and schedules'],
+        'students': ['My Students', 'View and search your students'],
+        'materials': ['Class Materials', 'Upload and manage learning resources'],
+        'meetings': ['Zoom Meetings', 'Schedule and manage online sessions']
+    };
+    document.getElementById('panelTitle').textContent = titles[panel]?.[0] || panel;
+    document.getElementById('panelSubtitle').textContent = titles[panel]?.[1] || '';
+
+    if (panel === 'classes') loadTeacherClasses();
+    if (panel === 'materials') loadMaterials();
+    if (panel === 'meetings') loadMeetings();
+    if (panel === 'students') loadStudents();
+    if (panel === 'overview') loadOverview();
+
+    document.getElementById('sidebar').classList.remove('open');
+}
+
+// ============================================
+// MODALS
+// ============================================
+function openModal(id) {
+    document.getElementById(id).classList.add('show');
+    if (id === 'materialModal' || id === 'meetingModal') {
+        populateClassSelects();
+    }
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+    if (id === 'materialModal') clearMaterialFile();
+}
+
+// ============================================
+// AUTH
+// ============================================
+function checkAuth() {
+    const stored = localStorage.getItem('fluxTeacher');
+    if (stored) {
+        try {
+            currentUser = JSON.parse(stored);
+            if (currentUser.role !== 'teacher') {
+                localStorage.removeItem('fluxTeacher');
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+            renderTeacherProfile();
+            loadOverview();
+            loadTeacherClasses().then(() => {
+                populateAllFilters();
+            });
+            return true;
+        } catch (e) {
+            localStorage.removeItem('fluxTeacher');
+        }
+    }
+    window.location.href = 'admin-login.html';
+    return false;
+}
+
+function renderTeacherProfile() {
+    const fullName = (currentUser.first_name || '') + ' ' + (currentUser.last_name || '');
+    const initial = (currentUser.first_name || 'T').charAt(0).toUpperCase();
+
+    document.getElementById('teacherName').textContent = fullName.trim();
+    document.getElementById('teacherAvatar').textContent = initial;
+    document.getElementById('teacherSubject').textContent = '📚 ' + (currentUser.subject || 'Teacher');
+    document.getElementById('greeting').innerHTML = `Hello, <strong>${currentUser.first_name}</strong>! 👋`;
+}
+
+function logout() {
+    if (!confirm('Are you sure you want to logout?')) return;
+    localStorage.removeItem('fluxTeacher');
+    localStorage.removeItem('flux_last_activity');
+    fetch('backend.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'action=logout'
+    }).catch(() => {});
+    window.location.href = 'admin-login.html';
+}
+
+// ============================================
+// OVERVIEW
+// ============================================
+async function loadOverview() {
+    const result = await apiRequest('teacher_overview');
+    if (!result.success) {
+        console.error('Overview failed:', result.message);
+        return;
+    }
+    const data = result.data;
+
+    document.getElementById('statClasses').textContent = data.total_classes || 0;
+    document.getElementById('statStudents').textContent = data.total_students || 0;
+    document.getElementById('statMaterials').textContent = data.total_materials || 0;
+    document.getElementById('statMeetings').textContent = (data.upcoming_meetings || []).length;
+
+    // Class count badge
+    const badge = document.getElementById('classCount');
+    if (data.total_classes > 0) {
+        badge.textContent = data.total_classes;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
+
+    renderUpcomingMeetings(data.upcoming_meetings || []);
+    renderOverviewClasses(data.classes || []);
+}
+
+function renderUpcomingMeetings(meetings) {
+    const container = document.getElementById('upcomingMeetings');
+    if (meetings.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="ti ti-calendar-off"></i>
+                <strong>No upcoming meetings</strong>
+                Schedule a new Zoom meeting to get started
+            </div>
+        `;
+        return;
+    }
+    container.innerHTML = meetings.slice(0, 3).map(m => `
+        <div class="meeting-card">
+            <div class="meeting-info">
+                <strong>${m.title}</strong>
+                <div class="meta">📚 ${m.class_name}</div>
+                <div class="meta">📅 ${new Date(m.start_time).toLocaleString()}</div>
+            </div>
+            <a href="${m.meeting_url}" target="_blank" class="btn btn-success btn-sm">
+                <i class="ti ti-video"></i> Join
+            </a>
+        </div>
+    `).join('');
+}
+
+function renderOverviewClasses(classes) {
+    const container = document.getElementById('overviewClasses');
+    if (classes.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="ti ti-book-off"></i>
+                <strong>No classes yet</strong>
+                Add your first class from the Classes tab
+            </div>
+        `;
+        return;
+    }
+    container.innerHTML = classes.slice(0, 3).map(c => `
+        <div class="student-item">
+            <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--primary);">
+                    ${c.subject.charAt(0)}
+                </div>
+                <div class="student-info">
+                    <div style="font-weight:600;">${c.name}</div>
+                    <div style="font-size:0.8rem;color:var(--muted);">${c.subject} · ${c.year} · ${c.schedule || 'TBA'}</div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================================
+// CLASSES
+// ============================================
+async function loadTeacherClasses() {
+    const result = await apiRequest('get_teacher_classes');
+    if (!result.success) return;
+    teacherClasses = result.data || [];
+    renderClasses();
+    populateAllFilters();
+}
+
+function renderClasses() {
+    const container = document.getElementById('teacherClasses');
+    if (teacherClasses.length === 0) {
+        container.innerHTML = `
+            <div class="card" style="grid-column:1/-1;">
+                <div class="empty-state">
+                    <i class="ti ti-book-off"></i>
+                    <strong>No classes yet</strong>
+                    Click "Add Class" to create your first class
+                </div>
+            </div>
+        `;
+        return;
+    }
+    container.innerHTML = teacherClasses.map(c => `
+        <div class="class-card">
+            <span class="class-tag">${c.subject}</span>
+            <h4>${c.name}</h4>
+            <div class="meta">
+                <div class="row"><i class="ti ti-calendar"></i> ${c.year}</div>
+                <div class="row"><i class="ti ti-clock"></i> ${c.schedule || 'Schedule TBA'}</div>
+                <div class="row"><i class="ti ti-currency-dollar"></i> LKR ${parseFloat(c.price || 25000).toLocaleString()}</div>
+            </div>
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="val">${c.student_count || 0}</div>
+                    <div class="lbl">Students</div>
+                </div>
+                <div class="stat">
+                    <div class="val">${c.capacity || 50}</div>
+                    <div class="lbl">Capacity</div>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary btn-xs" onclick="viewClassStudents(${c.id})">
+                    <i class="ti ti-users"></i> Students
+                </button>
+                <button class="btn btn-info btn-xs" onclick="openMaterialForClass(${c.id})">
+                    <i class="ti ti-cloud-upload"></i> Upload
+                </button>
+                <button class="btn btn-gold btn-xs" onclick="openMeetingForClass(${c.id})">
+                    <i class="ti ti-video-plus"></i> Meeting
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function addClass() {
+    const data = {
+        name: document.getElementById('addClassName').value.trim(),
+        subject: document.getElementById('addClassSubject').value,
+        year: document.getElementById('addClassYear').value,
+        schedule: document.getElementById('addClassSchedule').value.trim(),
+        price: document.getElementById('addClassPrice').value,
+        capacity: document.getElementById('addClassCapacity').value
+    };
+    if (!data.name) {
+        showAlert('Please enter a class name', 'error');
+        return;
+    }
+    const result = await apiRequest('add_class', 'POST', data);
+    if (result.success) {
+        showAlert('✅ Class added successfully!', 'success');
+        closeModal('classModal');
+        document.getElementById('addClassName').value = '';
+        document.getElementById('addClassSchedule').value = '';
+        loadTeacherClasses();
+        loadOverview();
+    } else {
+        showAlert('❌ ' + (result.message || 'Failed'), 'error');
+    }
+}
+
+// ============================================
+// STUDENTS
+// ============================================
+async function loadStudents() {
+    const filterClass = document.getElementById('studentFilter').value;
+    const search = document.getElementById('studentSearch').value.trim();
+    const result = await apiRequest('get_teacher_students', 'POST', {
+        class_id: filterClass,
+        search: search
+    });
+    if (!result.success) return;
+
+    allStudents = result.data || [];
+    renderStudents();
+}
+
+function renderStudents() {
+    const container = document.getElementById('studentsList');
+    if (allStudents.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="ti ti-users-minus"></i>
+                <strong>No students found</strong>
+                ${document.getElementById('studentSearch').value ? 'Try a different search' : 'Students will appear here once they enroll'}
+            </div>
+        `;
+        return;
+    }
+
+    // Group by class
+    const byClass = {};
+    allStudents.forEach(s => {
+        const key = s.class_name || 'Unassigned';
+        if (!byClass[key]) byClass[key] = [];
+        byClass[key].push(s);
+    });
+
+    let html = '';
+    for (const [className, students] of Object.entries(byClass)) {
+        html += `<div style="margin-bottom:1.5rem;">
+            <h4 style="font-size:0.85rem;color:var(--gold);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.5px;">
+                📚 ${className} <span style="color:var(--muted);font-weight:400;">(${students.length})</span>
+            </h4>`;
+        html += students.map(s => `
+            <div class="student-item">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                    <div class="avatar-sm">${s.first_name.charAt(0).toUpperCase()}</div>
+                    <div class="student-info">
+                        <div style="font-weight:600;">${s.first_name} ${s.last_name}</div>
+                        <div style="font-size:0.8rem;color:var(--muted);">
+                            📧 ${s.email}${s.phone ? ' · 📞 ' + s.phone : ''}
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <a href="mailto:${s.email}" class="btn btn-ghost btn-xs">
+                        <i class="ti ti-mail"></i> Email
+                    </a>
+                    ${s.phone ? `<a href="tel:${s.phone}" class="btn btn-ghost btn-xs"><i class="ti ti-phone"></i> Call</a>` : ''}
+                </div>
+            </div>
+        `).join('');
+        html += '</div>';
+    }
+
+    container.innerHTML = html;
+}
+
+let studentSearchTimeout = null;
+function debouncedLoadStudents() {
+    clearTimeout(studentSearchTimeout);
+    studentSearchTimeout = setTimeout(loadStudents, 300);
+}
+
+function viewClassStudents(classId) {
+    showPanel('students');
+    document.getElementById('studentFilter').value = classId;
+    loadStudents();
+}
+
+// ============================================
+// MATERIALS
+// ============================================
+async function loadMaterials() {
+    const result = await apiRequest('get_materials');
+    if (!result.success) return;
+    allMaterials = result.data || [];
+    renderMaterials();
+}
+
+function renderMaterials() {
+    const container = document.getElementById('materialsList');
+    const filterClass = document.getElementById('materialFilter').value;
+    const search = document.getElementById('materialSearch').value.toLowerCase().trim();
+
+    let filtered = allMaterials;
+    if (filterClass) {
+        filtered = filtered.filter(m => String(m.class_id) === String(filterClass));
+    }
+    if (search) {
+        filtered = filtered.filter(m =>
+            m.title.toLowerCase().includes(search) ||
+            (m.description || '').toLowerCase().includes(search) ||
+            (m.class_name || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="ti ti-folder-off"></i>
+                <strong>No materials found</strong>
+                ${allMaterials.length === 0
+                    ? 'Upload your first material to get started'
+                    : 'Try changing the filter or search'}
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = filtered.map(m => {
+        const icon = getFileIcon(m.file_type);
+        return `
+            <div class="material-item">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:200px;">
+                    <div class="icon">${icon}</div>
+                    <div class="info">
+                        <div class="title">${m.title}</div>
+                        <div class="meta">${m.class_name || 'Unassigned'} · ${new Date(m.created_at).toLocaleDateString()}</div>
+                        ${m.description ? `<div class="meta" style="margin-top:4px;">${m.description}</div>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn btn-danger btn-xs" onclick="deleteMaterial(${m.id})">
+                        <i class="ti ti-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getFileIcon(fileType) {
+    if (!fileType) return '📁';
+    if (fileType.includes('pdf')) return '📄';
+    if (fileType.includes('video') || fileType.includes('mp4')) return '🎬';
+    if (fileType.includes('image')) return '🖼️';
+    if (fileType.includes('word') || fileType.includes('document')) return '📝';
+    if (fileType.includes('presentation') || fileType.includes('ppt')) return '📊';
+    return '📎';
+}
+
+let materialSearchTimeout = null;
+function debouncedLoadMaterials() {
+    clearTimeout(materialSearchTimeout);
+    materialSearchTimeout = setTimeout(renderMaterials, 300);
+}
+
+function openMaterialForClass(classId) {
+    openModal('materialModal');
+    setTimeout(() => {
+        document.getElementById('materialClass').value = classId;
+    }, 100);
+}
+
+function handleMaterialFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+        showAlert('File must be under 20MB', 'error');
+        event.target.value = '';
+        return;
+    }
+
+    selectedMaterialFile = file;
+    document.getElementById('materialFileName').textContent = file.name;
+    document.getElementById('materialFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+    document.getElementById('materialFilePreview').classList.add('show');
+}
+
+function clearMaterialFile() {
+    selectedMaterialFile = null;
+    const fileInput = document.getElementById('materialFile');
+    if (fileInput) fileInput.value = '';
+    const preview = document.getElementById('materialFilePreview');
+    if (preview) preview.classList.remove('show');
+}
+
+async function uploadMaterial() {
+    const classId = document.getElementById('materialClass').value;
+    const title = document.getElementById('materialTitle').value.trim();
+    const desc = document.getElementById('materialDesc').value.trim();
+
+    if (!classId) { showAlert('Please select a class', 'error'); return; }
+    if (!title) { showAlert('Please enter a title', 'error'); return; }
+    if (!selectedMaterialFile) { showAlert('Please select a file', 'error'); return; }
+
+    const btn = document.getElementById('uploadMaterialBtn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Uploading...';
+    btn.disabled = true;
+
+    try {
+        const result = await apiRequest('add_material', 'POST', {
+            class_id: classId,
+            title: title,
+            description: desc,
+            file_name: selectedMaterialFile.name,
+            file_type: selectedMaterialFile.type || 'application/octet-stream'
+        });
+
+        if (result.success) {
+            showAlert('✅ Material uploaded successfully!', 'success');
+            closeModal('materialModal');
+            document.getElementById('materialTitle').value = '';
+            document.getElementById('materialDesc').value = '';
+            clearMaterialFile();
+            loadMaterials();
+            loadOverview();
+        } else {
+            showAlert('❌ ' + (result.message || 'Failed to upload'), 'error');
+        }
+    } catch (e) {
+        showAlert('❌ Network error', 'error');
+    } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+    }
+}
+
+async function deleteMaterial(id) {
+    if (!confirm('Delete this material? This cannot be undone.')) return;
+    const result = await apiRequest('delete_material', 'POST', { material_id: id });
+    if (result.success) {
+        showAlert('✅ Material deleted', 'success');
+        loadMaterials();
+        loadOverview();
+    } else {
+        showAlert('❌ ' + (result.message || 'Failed'), 'error');
+    }
+}
+
+// ============================================
+// MEETINGS
+// ============================================
+async function loadMeetings() {
+    const result = await apiRequest('get_meetings');
+    if (!result.success) return;
+    allMeetings = result.data || [];
+    renderMeetings();
+}
+
+function renderMeetings() {
+    const container = document.getElementById('meetingsList');
+    const filterClass = document.getElementById('meetingFilter').value;
+    const filterStatus = document.getElementById('meetingStatusFilter').value;
+
+    let filtered = allMeetings;
+    if (filterClass) filtered = filtered.filter(m => String(m.class_id) === String(filterClass));
+    if (filterStatus) filtered = filtered.filter(m => m.status === filterStatus);
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="ti ti-video-off"></i>
+                <strong>No meetings found</strong>
+                ${allMeetings.length === 0
+                    ? 'Schedule your first Zoom meeting'
+                    : 'Try changing the filters'}
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = filtered.map(m => {
+        const isUpcoming = new Date(m.start_time) > new Date();
+        return `
+            <div class="meeting-card">
+                <div class="meeting-info">
+                    <strong>${m.title}</strong>
+                    <div class="meta">📚 ${m.class_name || 'No class'}</div>
+                    <div class="meta">📅 ${new Date(m.start_time).toLocaleString()}</div>
+                    <div class="meta">⏱️ ${m.duration || 60} minutes</div>
+                    <div class="meeting-url">🔗 <a href="${m.meeting_url}" target="_blank" style="color:var(--accent-light);">${m.meeting_url}</a></div>
+                    ${m.password ? `<div class="meta">🔒 Password: <strong>${m.password}</strong></div>` : ''}
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    <span class="btn btn-xs ${isUpcoming ? 'btn-success' : 'btn-ghost'}" style="cursor:default;">
+                        ${isUpcoming ? '🟢 Upcoming' : '⚪ Past'}
+                    </span>
+                    ${isUpcoming ? `<a href="${m.meeting_url}" target="_blank" class="btn btn-primary btn-xs"><i class="ti ti-video"></i> Join</a>` : ''}
+                    <button class="btn btn-danger btn-xs" onclick="deleteMeeting(${m.id})">
+                        <i class="ti ti-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function openMeetingForClass(classId) {
+    openModal('meetingModal');
+    setTimeout(() => {
+        document.getElementById('meetingClass').value = classId;
+    }, 100);
+}
+
+async function scheduleMeeting() {
+    const classId = document.getElementById('meetingClass').value;
+    const title = document.getElementById('meetingTitle').value.trim();
+    const date = document.getElementById('meetingDate').value;
+    const time = document.getElementById('meetingTime').value;
+    const duration = document.getElementById('meetingDuration').value;
+    const url = document.getElementById('meetingUrl').value.trim();
+    const password = document.getElementById('meetingPassword').value.trim();
+
+    if (!classId) { showAlert('Please select a class', 'error'); return; }
+    if (!title) { showAlert('Please enter a meeting title', 'error'); return; }
+    if (!date || !time) { showAlert('Please select date and time', 'error'); return; }
+    if (!url) { showAlert('Please enter the Zoom meeting URL', 'error'); return; }
+
+    const startTime = date + ' ' + time + ':00';
+    const result = await apiRequest('add_meeting', 'POST', {
+        class_id: classId,
+        title: title,
+        meeting_url: url,
+        meeting_id: url.split('/').pop(),
+        password: password,
+        start_time: startTime,
+        duration: duration
+    });
+
+    if (result.success) {
+        showAlert('✅ Meeting scheduled successfully!', 'success');
+        closeModal('meetingModal');
+        document.getElementById('meetingTitle').value = '';
+        document.getElementById('meetingUrl').value = '';
+        document.getElementById('meetingPassword').value = '';
+        loadMeetings();
+        loadOverview();
+    } else {
+        showAlert('❌ ' + (result.message || 'Failed'), 'error');
+    }
+}
+
+async function deleteMeeting(id) {
+    if (!confirm('Delete this meeting?')) return;
+    const result = await apiRequest('delete_meeting', 'POST', { meeting_id: id });
+    if (result.success) {
+        showAlert('✅ Meeting deleted', 'success');
+        loadMeetings();
+        loadOverview();
+    }
+}
+
+// ============================================
+// DROPDOWNS / FILTERS
+// ============================================
+function populateClassSelects() {
+    ['materialClass', 'meetingClass'].forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.innerHTML = '<option value="">-- Select a class --</option>' +
+                teacherClasses.map(c => `<option value="${c.id}">${c.name} (${c.subject} ${c.year})</option>`).join('');
+        }
+    });
+}
+
+function populateAllFilters() {
+    ['studentFilter', 'materialFilter', 'meetingFilter'].forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">All Classes</option>' +
+                teacherClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            select.value = currentValue;
+        }
+    });
+}
+
+// ============================================
+// ALERTS
+// ============================================
+function showAlert(msg, type = 'info') {
+    const el = document.getElementById('alertMessage');
+    el.textContent = msg;
+    el.className = 'alert alert-' + type + ' show';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+// ============================================
+// INIT
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    if (checkAuth()) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('meetingDate').value = today;
+        document.getElementById('meetingTime').value = '10:00';
+
+        // Drag & drop for material file
+        const zone = document.getElementById('materialUploadZone');
+        if (zone) {
+            ['dragenter', 'dragover'].forEach(evt => {
+                zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.add('dragover'); });
+            });
+            ['dragleave', 'drop'].forEach(evt => {
+                zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.remove('dragover'); });
+            });
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    document.getElementById('materialFile').files = e.dataTransfer.files;
+                    handleMaterialFile({ target: { files: [file] } });
+                }
+            });
+        }
+    }
+});
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('show');
+    });
+});
+</script>
+</body>
+</html>

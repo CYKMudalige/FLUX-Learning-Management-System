@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Login | Flux Academic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a1628;
+            color: #e8edf5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(ellipse at 50% 0%, rgba(13,124,110,0.15), transparent 70%);
+        }
+        .login-container { width: 100%; max-width: 460px; padding: 2rem; }
+        .login-box {
+            background: rgba(22, 36, 60, 0.95);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; justify-content: center; }
+        .logo .icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #0d7c6e, #e8b84b);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; font-size: 1.2rem;
+        }
+        .logo h1 { font-size: 1.3rem; font-weight: 700; }
+        .logo h1 span { color: #e8b84b; }
+        .login-title { text-align: center; margin-bottom: 0.5rem; font-size: 1.4rem; font-weight: 700; }
+        .login-sub { text-align: center; color: #8fa3be; font-size: 0.85rem; margin-bottom: 2rem; }
+
+        /* Role Selector - 3 columns for Admin / Teacher / Reception */
+        .role-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+        .role-btn {
+            padding: 12px 8px;
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            background: transparent;
+            color: #8fa3be;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .role-btn:hover { border-color: rgba(13,124,110,0.5); color: #14a898; }
+        .role-btn.active { border-color: #0d7c6e; background: rgba(13,124,110,0.15); color: #14a898; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; color: #8fa3be; margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%; padding: 12px 16px;
+            background: rgba(29, 47, 74, 0.8);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: #e8edf5;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+        .form-group input:focus { outline: none; border-color: #0d7c6e; }
+        .submit-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(105deg, #0d7c6e, #14a898);
+            border: none; border-radius: 40px;
+            color: #fff; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .submit-btn:hover { opacity: 0.9; }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .alert { padding: 12px 16px; border-radius: 12px; margin-bottom: 1rem; font-size: 0.85rem; display: none; }
+        .alert-error { background: rgba(231,76,60,0.15); border: 1px solid #e74c3c; color: #e74c3c; }
+        .alert-success { background: rgba(46,204,113,0.15); border: 1px solid #2ecc71; color: #2ecc71; }
+        .spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .back-link { display: block; text-align: center; margin-top: 1.5rem; color: #8fa3be; font-size: 0.8rem; text-decoration: none; }
+        .back-link:hover { color: #14a898; }
+
+        /* Quick Login */
+        .demo-credentials {
+            margin-top: 1.5rem; padding: 1rem;
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #8fa3be;
+        }
+        .demo-credentials .demo-title {
+            color: #14a898;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+        .quick-login-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .quick-btn {
+            padding: 8px 6px;
+            background: rgba(13,124,110,0.12);
+            border: 1px solid rgba(13,124,110,0.3);
+            border-radius: 8px;
+            color: #14a898;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .quick-btn:hover {
+            background: rgba(13,124,110,0.25);
+            border-color: #14a898;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-box">
+        <div class="logo"><div class="icon">Fx</div><h1>Flux <span>Academic</span></h1></div>
+        <div class="login-title">Staff Login</div>
+        <div class="login-sub">Access your dashboard</div>
+
+        <div id="loginAlert" class="alert"></div>
+
+        <!-- Role Selector -->
+        <div class="role-selector">
+            <button class="role-btn active" onclick="selectRole('admin')" id="role-admin">👑 Admin</button>
+            <button class="role-btn" onclick="selectRole('teacher')" id="role-teacher">👨‍🏫 Teacher</button>
+            <button class="role-btn" onclick="selectRole('reception')" id="role-reception">🎫 Reception</button>
+        </div>
+
+        <!-- Login Form -->
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="loginUsername" value="admin" autocomplete="username">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" value="password" autocomplete="current-password">
+        </div>
+        <button class="submit-btn" onclick="handleLogin()" id="loginBtn">Login →</button>
+
+  
+
+        <a href="INDEX.html" class="back-link">← Back to Home</a>
+    </div>
+</div>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+let selectedRole = 'admin';
+
+// ============================================
+// ROLE SELECTION
+// ============================================
+function selectRole(role) {
+    selectedRole = role;
+
+    // Update active button
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('role-' + role);
+    if (btn) btn.classList.add('active');
+
+    // Auto-fill demo credentials
+    const demos = {
+        admin: { username: 'admin', password: 'password' },
+        teacher: { username: 'kamal', password: 'password' },
+        reception: { username: 'reception', password: 'password' }
+    };
+    const demo = demos[role] || demos.admin;
+    document.getElementById('loginUsername').value = demo.username;
+    document.getElementById('loginPassword').value = demo.password;
+}
+
+// ============================================
+// QUICK LOGIN
+// ============================================
+function quickLogin(username, password, role) {
+    selectRole(role);
+    document.getElementById('loginUsername').value = username;
+    document.getElementById('loginPassword').value = password;
+    handleLogin();
+}
+
+// ============================================
+// ALERT
+// ============================================
+function showAlert(msg, type = 'error') {
+    const el = document.getElementById('loginAlert');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'alert alert-' + type;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+// ============================================
+// LOGIN
+// ============================================
+async function handleLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!username || !password) {
+        showAlert('Please enter credentials', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Logging in...';
+
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'staff_login');
+        formData.append('username', username);
+        formData.append('password', password);
+        formData.append('role', selectedRole);
+
+        const response = await fetch('backend.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            const user = result.data;
+
+            // Save last activity timestamp for auto-logout
+            localStorage.setItem('flux_last_activity', Date.now().toString());
+
+            // Clear any existing sessions
+            localStorage.removeItem('fluxAdmin');
+            localStorage.removeItem('fluxTeacher');
+            localStorage.removeItem('fluxReception');
+            localStorage.removeItem('fluxUser');
+
+            // Route based on role
+            if (user.role === 'admin') {
+                localStorage.setItem('fluxAdmin', JSON.stringify(user));
+                window.location.href = 'admin-dashboard.html';
+            } else if (user.role === 'teacher') {
+                localStorage.setItem('fluxTeacher', JSON.stringify(user));
+                window.location.href = 'teacher-dashboard.html';
+            } else if (user.role === 'reception') {
+                localStorage.setItem('fluxReception', JSON.stringify(user));
+                window.location.href = 'reception-dashboard.html';
+            } else {
+                showAlert('Unknown role: ' + user.role, 'error');
+            }
+        } else {
+            showAlert(result.message || 'Login failed', 'error');
+        }
+
+    } catch (error) {
+        console.error('Login error:', error);
+        showAlert('Network error. Please check your connection.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Login →';
+    }
+}
+
+// ============================================
+// ENTER KEY SUPPORT
+// ============================================
+document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleLogin();
+});
+
+document.getElementById('loginUsername').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+});
+</script>
+</body>
+</html>
